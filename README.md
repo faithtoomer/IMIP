@@ -47,3 +47,15 @@ See `architecture/GOVERNANCE.md` for repository laws.
 ## Phase 00 Deliverables
 
 See `docs/phase-00/` for the migration report, validation report, and certification checklist.
+
+## Local PC Setup
+
+Cloud agents cannot access your workstation. On the local PC:
+
+```bash
+git checkout cursor/phase-00-repository-governance-5130
+chmod +x scripts/local-pc-bootstrap.sh
+./scripts/local-pc-bootstrap.sh
+```
+
+If `Monero_Engine` / `Flux_Engine` already exist on that machine, import them with the paths documented in `docs/phase-00/local-pc-setup.md`.
