@@ -9,6 +9,8 @@ These are the only documents Cursor may implement.
 | Document | Status |
 |----------|--------|
 | `PHASE-00-repository-governance.md` | APPROVED FOR IMPLEMENTATION |
+| `PHASE-01-institutional-system-architecture-runtime-blueprint.md` | APPROVED FOR IMPLEMENTATION |
+| `PHASE-02-configuration-authority.md` | APPROVED FOR IMPLEMENTATION |
 
 ## Rules
 

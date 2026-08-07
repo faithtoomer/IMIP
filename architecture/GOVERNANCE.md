@@ -76,6 +76,7 @@ The Core Platform owns every institutional capability, including but not limited
 - Metrics
 - Explainability
 - Platform Capability Registry (PCR)
+- Policy Engine (reserved)
 
 These capabilities shall never exist inside plugin directories.
 
@@ -194,3 +195,11 @@ No additional top-level folders may be introduced without architectural approval
 ## 10. Expansion Principle
 
 The repository architecture shall remain stable regardless of how many mining engines, coins, workstations, or capability classes are added. Adding a new coin, miner, or hardware type is a registration and plugin exercise — not a core architectural change.
+
+---
+
+## 11. Runtime Architecture (Phase 01)
+
+`architecture/RUNTIME_ARCHITECTURE.md` is binding, alongside this document. It establishes the runtime topology, runtime layers, runtime lifecycle, dependency laws, event bus model, decision pipeline, explainability pipeline, runtime state machine, and AI integration boundaries. No authority, plugin, or interface may bypass it.
+
+`core/policy_engine/` is reserved for the Policy Authority. Every decision in the Decision Pipeline is evaluated against policy before execution. See ADR-0004.

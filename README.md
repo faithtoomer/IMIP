@@ -9,6 +9,8 @@ IMIP is an institutional platform architecture for multi-engine, multi-hardware,
 | Phase | Name | Status |
 |-------|------|--------|
 | 00 | Repository Governance & Institutional Architecture | Established |
+| 01 | Institutional System Architecture & Runtime Blueprint | Established |
+| 02 | Configuration Authority (Single Source of Truth) | Implemented |
 
 ## Repository Architecture
 
@@ -17,7 +19,9 @@ IMIP/
 ├── architecture/     # ADRs, contracts, diagrams, governance
 ├── specs/            # Institutional Engineering Specifications (implementation authority)
 ├── core/             # Institutional platform logic (never coin/miner logic)
-│   └── capability_registry/   # Reserved — Platform Capability Registry (PCR)
+│   ├── capability_registry/   # Reserved — Platform Capability Registry (PCR)
+│   ├── policy_engine/         # Reserved — Policy Authority (Phase 01)
+│   └── configuration_authority/  # Implemented — Single Source of Truth (Phase 02)
 ├── plugins/          # Mining implementations by capability class
 │   ├── cpu/
 │   │   └── monero/
@@ -47,6 +51,23 @@ See `architecture/GOVERNANCE.md` for repository laws.
 ## Phase 00 Deliverables
 
 See `docs/phase-00/` for the migration report, validation report, and certification checklist.
+
+## Phase 01 — Runtime Architecture
+
+The complete runtime blueprint (topology, authority hierarchy, decision pipeline, event model, dependency laws, explainability pipeline, AI boundaries) is defined in `architecture/RUNTIME_ARCHITECTURE.md` and `architecture/AUTHORITY_REGISTRY.md`. See `docs/phase-01/` for the deliverable summary and certification checklist.
+
+## Phase 02 — Configuration Authority
+
+The Configuration Authority (`core/configuration_authority/`) is IMIP's first implemented module and institutional Single Source of Truth. Node.js (ESM) + TypeScript; run `npm install && npm test` to verify. See `core/configuration_authority/README.md` and `docs/phase-02/` for the implementation summary, the Configuration/Policy boundary mapping, and the certification checklist.
+
+### Local Development
+
+```bash
+npm install
+npm run typecheck
+npm test
+npm run build
+```
 
 ## Local PC Setup
 

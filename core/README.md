@@ -23,6 +23,7 @@ Core owns every institutional capability, including:
 - Metrics
 - Explainability
 - Platform Capability Registry (reserved)
+- Policy Engine (reserved)
 
 ## Prohibitions
 
@@ -38,6 +39,17 @@ Core directories are established. No platform modules are implemented in Phase 0
 
 ```text
 core/capability_registry/
+core/policy_engine/
 ```
 
 See `capability_registry/README.md` and `architecture/adr/ADR-0002-platform-capability-registry.md`.
+
+See `policy_engine/README.md` and `architecture/adr/ADR-0004-policy-authority.md`.
+
+## Phase 01
+
+Runtime architecture (topology, layers, lifecycle, dependency laws, decision pipeline, explainability pipeline) is documented in `architecture/RUNTIME_ARCHITECTURE.md`. No platform modules are implemented in Phase 01.
+
+## Phase 02
+
+`core/configuration_authority/` is the first implemented core module — the institutional Single Source of Truth. See `configuration_authority/README.md`, `architecture/adr/ADR-0005-configuration-authority-ssot.md`, and `architecture/adr/ADR-0006-configuration-policy-boundary.md`.
