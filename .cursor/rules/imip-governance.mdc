@@ -1,0 +1,36 @@
+---
+description: IMIP Phase 00 repository governance — binding for all future work
+alwaysApply: true
+---
+
+# IMIP Institutional Governance
+
+You are operating inside the Institutional Mining Intelligence Platform (IMIP).
+
+## Authorities
+
+- Architectural Authority: specifications under `specs/` only
+- Implementation Authority: Cursor, executing approved specifications
+- Binding governance: `architecture/GOVERNANCE.md`
+
+## Ownership
+
+- `core/` owns all institutional capabilities (configuration, decision engine, runtime, scheduler, telemetry, logging, hardware detection, health, profitability, AI, event bus, security, metrics, explainability, database access, dashboard integration, capability registry)
+- `plugins/` owns only implementation-specific mining functionality
+- Institutional services exist exactly once — no duplicates
+
+## Structural Laws
+
+- Do not introduce top-level folders without architectural approval
+- Do not place platform logic in plugins
+- Do not place coin/miner logic in core
+- Do not hardcode plugin knowledge; discovery is via manifests
+- Do not infer functionality from directory names
+- `core/capability_registry/` is reserved; do not invent PCR behavior without an approved spec
+
+## Phase Discipline
+
+- Implement only approved specs under `specs/`
+- Do not create placeholder implementations
+- Do not introduce TODOs as substitutes for specification work
+- Preserve files and prefer directory moves over recreation during migrations
