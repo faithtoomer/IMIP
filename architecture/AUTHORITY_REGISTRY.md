@@ -28,7 +28,7 @@ Full authority contracts (Responsibilities, Owned State, Dependencies, Published
 | Telemetry Authority | Institutional Authority | Owns telemetry collection and distribution. |
 | Database Authority | Institutional Authority | Owns data persistence and the permanent audit trail. |
 | Security Authority | Institutional Authority | Owns platform security policy and enforcement. |
-| Workload Authority | Institutional Authority | Owns workload evaluation and allocation decisions. |
+| Workload Authority | Institutional Authority | Owns workload governance, classification, lifecycle, priorities, advisory placement recommendations, balancing, efficiency analysis, explainability, and the Institutional Workload Digital Twin (IWDT). Implemented as IWIA (`core/workload_authority/`, PHASE-19). |
 | Notification Authority | Institutional Authority | Owns institutional notifications and alerting. |
 | Earnings Authority | Institutional Authority | Owns earnings tracking and reporting. |
 | Policy Authority | Institutional Authority | Owns operational policy evaluation via the Policy Engine (`core/policy_engine/`); every decision is evaluated against policy before execution. |

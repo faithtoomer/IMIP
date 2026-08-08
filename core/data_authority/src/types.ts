@@ -1,7 +1,8 @@
 /** §6 — the 18 institutional data domains, plus additive Program II/III
  * extensions (documented at each addition site — see ADR-0013 for
  * 'runtime-logs', added for IOLA's optional database log sink, and
- * ADR-0019 for 'power-history', added for IPIA — deliberately distinct
+ * ADR-0009 for 'power-history', added for IPIA, and ADR-0019 for
+ * workload-registry/workload-history, added for IWIA — deliberately distinct
  * from the existing, ambiguous 'telemetry' value, which no authority has
  * ever actually claimed). */
 export type DataDomain =
@@ -15,6 +16,8 @@ export type DataDomain =
   | 'decision-history'
   | 'profitability-history'
   | 'benchmark-results'
+  | 'workload-registry'
+  | 'workload-history'
   | 'mining-sessions'
   | 'wallet-metadata'
   | 'pool-metadata'
