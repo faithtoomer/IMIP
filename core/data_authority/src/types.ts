@@ -1,6 +1,9 @@
-/** §6 — the 18 institutional data domains, plus additive Program II
+/** §6 — the 18 institutional data domains, plus additive Program II/III
  * extensions (documented at each addition site — see ADR-0013 for
- * 'runtime-logs', added for IOLA's optional database log sink). */
+ * 'runtime-logs', added for IOLA's optional database log sink, and
+ * ADR-0019 for 'power-history', added for IPIA — deliberately distinct
+ * from the existing, ambiguous 'telemetry' value, which no authority has
+ * ever actually claimed). */
 export type DataDomain =
   | 'configuration'
   | 'capability-registry'
@@ -20,7 +23,8 @@ export type DataDomain =
   | 'ai-models'
   | 'explainability-records'
   | 'audit-logs'
-  | 'runtime-logs';
+  | 'runtime-logs'
+  | 'power-history';
 
 export type FieldType = 'string' | 'number' | 'boolean' | 'json' | 'timestamp';
 

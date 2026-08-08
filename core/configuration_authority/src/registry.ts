@@ -300,6 +300,21 @@ export const DEFAULT_ENTRIES: ConfigEntry[] = [
     versionIntroduced: '1.0.0',
     securityClassification: 'public',
   },
+  {
+    // Added for PHASE-16/IPIA (ADR-0019) — a real, explainable, operator-tunable
+    // overhead factor for deriving estimated platform wall power from summed
+    // component draw, instead of a hardcoded constant in source.
+    id: 'hardware.estimatedPsuEfficiency',
+    category: 'hardware',
+    description: 'Estimated PSU efficiency factor used to derive platform wall power from summed component draw',
+    dataType: 'number',
+    defaultValue: 0.9,
+    range: { min: 0, max: 1 },
+    owner: 'Configuration Authority',
+    runtimeMutability: 'hot-reloadable',
+    versionIntroduced: '1.0.0',
+    securityClassification: 'public',
+  },
 
   // ---- Pools (endpoints/ordering only — failover/retry policy deferred, see ADR-0006) ----
   {
