@@ -97,3 +97,13 @@ Runtime architecture (topology, layers, lifecycle, dependency laws, decision pip
 ## Phase 15
 
 `core/version_governance_authority/` is the twelfth implemented core module and Program II's eighth and final — the Institutional Version Governance & Migration Authority (IVGMA): real cross-authority version governance and migration orchestration over ICMS/IDA/IEB/IBRRA's own existing mechanisms, fail-closed compatibility verification, transactional migration, and the Institutional Evolution Graph. See `version_governance_authority/README.md` and `architecture/adr/ADR-0018-institutional-version-governance-migration-authority.md`. **Program II — Core Infrastructure is certified complete as of this phase.**
+
+## Program III — Resource Intelligence (Phases 16–18)
+
+| Phase | Module | Implementation |
+|-------|--------|----------------|
+| 16 | `core/power_authority/` | IPIA — Power Authority + Energy Digital Twin (IEDT). See ADR-0009. |
+| 17 | `core/thermal_authority/` | ITIA — Thermal Authority + Thermal Digital Twin (ITDT). See ADR-0010. |
+| 18 | `core/resource_authority/` | IRIA — Resource Authority + Resource Digital Twin (IRDT). See ADR-0011. |
+
+These authorities observe, analyze, forecast, and recommend. They do not directly control hardware power limits, fans, clocks, or voltages. Cross-authority integration uses injectable provider interfaces (never direct runtime imports).

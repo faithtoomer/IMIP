@@ -22,10 +22,13 @@ IMIP is an institutional platform architecture for multi-engine, multi-hardware,
 | 13 | Institutional Notification & Communication Authority (INCA) — Program II, institutional communication | Implemented |
 | 14 | Institutional Backup, Recovery & Resilience Authority (IBRRA) — Program II, operational resilience | Implemented |
 | 15 | Institutional Version Governance & Migration Authority (IVGMA) — Program II, final phase: version governance & controlled migration | Implemented |
+| 16 | Institutional Power Intelligence Authority (IPIA) + Energy Digital Twin | Implemented |
+| 17 | Institutional Thermal Intelligence Authority (ITIA) + Thermal Digital Twin | Implemented |
+| 18 | Institutional Resource Intelligence Authority (IRIA) + Resource Digital Twin | Implemented |
 
 Phase 04 was not implemented as a separate specification — its content overlapped almost entirely with Phase 03 and was absorbed as additive enhancements instead (`docs/phase-03/implementation-summary.md` §2a). Phase 06 was never specified; Phase 07 was given directly as Program I's final phase.
 
-**Program I (Foundation) is certified complete.** See `docs/program-1-certification/` for the consolidated architecture diagrams, authority registry, dependency graph, event/capability/configuration catalogs, runtime lifecycle documentation, certification results, and the known-assumptions ledger. **Program II (Core Infrastructure) is certified complete as of Phase 15** — eight authorities (Phases 08–15) built on Program I as a stable, documented platform. See `docs/phase-15/certification-checklist.md`.
+**Program I (Foundation) is certified complete.** See `docs/program-1-certification/` for the consolidated architecture diagrams, authority registry, dependency graph, event/capability/configuration catalogs, runtime lifecycle documentation, certification results, and the known-assumptions ledger. **Program II (Core Infrastructure) is certified complete as of Phase 15** — eight authorities (Phases 08–15) built on Program I as a stable, documented platform. See `docs/phase-15/certification-checklist.md`. **Program III (Resource Intelligence) is implemented as of Phase 18** — Power, Thermal, and Resource Authorities (Phases 16–18). See ADRs 0009–0011.
 
 ## Repository Architecture
 
@@ -47,7 +50,10 @@ IMIP/
 │   ├── security_authority/       # Implemented — Security & Trust Authority (Phase 12, Program II)
 │   ├── notification_authority/   # Implemented — Notification & Communication Authority (Phase 13, Program II)
 │   ├── resilience_authority/     # Implemented — Backup, Recovery & Resilience Authority (Phase 14, Program II)
-│   └── version_governance_authority/  # Implemented — Version Governance & Migration Authority (Phase 15, Program II)
+│   ├── version_governance_authority/  # Implemented — Version Governance & Migration Authority (Phase 15, Program II)
+│   ├── power_authority/          # Implemented — IPIA / Energy Digital Twin (Phase 16, Program III)
+│   ├── thermal_authority/        # Implemented — ITIA / Thermal Digital Twin (Phase 17, Program III)
+│   └── resource_authority/       # Implemented — IRIA / Resource Digital Twin (Phase 18, Program III)
 ├── plugins/          # Mining implementations by capability class
 │   ├── cpu/
 │   │   └── monero/
@@ -129,6 +135,16 @@ IBRRA (`core/resilience_authority/`) is Program II's seventh phase and the last 
 ## Phase 15 — Institutional Version Governance & Migration Authority (IVGMA)
 
 IVGMA (`core/version_governance_authority/`) is Program II's eighth and final phase — versioning and migration treated as one authority spanning two distinct concerns: versioning is governance (what version is this, is it certified, is it compatible), migration is controlled evolution (how the platform moves safely from one version to another). A pre-coding spec review (explicitly requested) found that ICMS, IDA, IEB, and IBRRA already have real version-tracking and migration/rollback primitives, so IVGMA is built as a real cross-authority governance and orchestration layer: every version source reads an already-real version field (ICMS's `getVersionInfo()`, IDA's `DomainSchema.version`, IEB's `EventDefinition.version`) and every migration executor wraps an already-real mechanism (ICMS's `reload()`/`rollback()`, IDA's migration-on-read, optionally IBRRA's `requestRecovery()` via a composable `withResilienceRollback()`) rather than duplicating migration logic — Law 1 applied reflexively to IVGMA's own design. A real naming collision with ICMS's own `CompatibilityRegistry` class was found and resolved by naming IVGMA's cross-artifact-type registry `ArtifactCompatibilityRegistry`. Fail-closed compatibility verification, transactional migration (certified or rolled back/failed, never left partial), and the Institutional Evolution Graph — a real model of version lineage, migration paths, and upgrade safety — built in full. See `core/version_governance_authority/README.md` and `docs/phase-15/` for the implementation summary and certification checklist. **This certifies Program II — Core Infrastructure as complete.**
+
+## Program III — Resource Intelligence (Phases 16–18)
+
+| Authority | Module | Twin | Role |
+|-----------|--------|------|------|
+| IPIA | `core/power_authority/` | IEDT | Power monitoring, cost/efficiency, budgets, advisory recommendations |
+| ITIA | `core/thermal_authority/` | ITDT | Thermal telemetry, trends/forecasts/anomalies, advisory recommendations |
+| IRIA | `core/resource_authority/` | IRDT | Resource registry, allocation/reservation/ownership, capacity forecasting |
+
+These authorities treat power, thermal behavior, and allocatable capacity as managed institutional resources. They observe, analyze, and recommend — they never directly mutate power limits, fans, clocks, or voltages. See `docs/phase-16/`, `docs/phase-17/`, `docs/phase-18/`, and ADRs 0009–0011.
 
 ### Local Development
 
