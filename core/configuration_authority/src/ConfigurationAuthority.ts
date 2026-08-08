@@ -4,6 +4,8 @@ import { runValidationPipeline } from './pipeline.js';
 import { CompatibilityRegistry } from './compatibility.js';
 import { createSnapshot, SnapshotStore } from './snapshot.js';
 import { CONFIG_EVENTS, ConfigEventBus, type ConfigEventName } from './events.js';
+import type { InstitutionalEventBus } from '../../event_bus/src/index.js';
+import type { StorageAuthority } from '../../storage_authority/src/index.js';
 import { maskSensitiveValues, maskSingleValue, shouldMask } from './security.js';
 import { AuditTrail } from './explainability.js';
 import { ProvenanceStore } from './provenance.js';
@@ -30,6 +32,14 @@ export interface ConfigurationAuthorityOptions extends LoadOptions {
   migrations?: MigrationDefinition[];
   /** ICMS's own schema version for this run. Defaults to the current registry schema version. */
   schemaVersion?: string;
+  /** Shared Institutional Event Bus (PHASE-05) to mirror events onto. Optional —
+   * without it, ConfigEventBus behaves exactly as it did before Phase 05 (ADR-0009). */
+  eventBus?: InstitutionalEventBus;
+  /** ADR-0012 (§Law 3): when given, and `filePath` is not explicitly provided,
+   * ICMS's default configuration file path is allocated from ISMA
+   * (`configuration` domain) instead of running without a config file source.
+   * Optional — omitting it preserves ICMS's exact pre-Phase-09 default behavior. */
+  storageAuthority?: StorageAuthority;
 }
 
 /**
@@ -42,7 +52,7 @@ export interface ConfigurationAuthorityOptions extends LoadOptions {
  */
 export class ConfigurationAuthority {
   readonly registry = new ConfigurationRegistry();
-  readonly events = new ConfigEventBus();
+  readonly events: ConfigEventBus;
   readonly audit: AuditTrail;
   readonly provenance = new ProvenanceStore();
   readonly snapshots = new SnapshotStore();
@@ -51,12 +61,18 @@ export class ConfigurationAuthority {
 
   private readonly migrationRunner: MigrationRunner;
   private readonly schemaVersion: string;
+  private readonly options: ConfigurationAuthorityOptions;
   private snapshotVersion = 0;
   private lastValidSnapshot?: ConfigSnapshot;
   private lastAppliedMigrationId = 'none';
 
-  constructor(private readonly options: ConfigurationAuthorityOptions = {}) {
+  constructor(options: ConfigurationAuthorityOptions = {}) {
+    const resolvedFilePath =
+      options.filePath ?? options.storageAuthority?.allocate('configuration', 'icms-config', { filename: 'config.json' }).path;
+    this.options = { ...options, filePath: resolvedFilePath };
+
     this.registry.registerAll(DEFAULT_ENTRIES);
+    this.events = new ConfigEventBus(options.eventBus);
     this.audit = new AuditTrail(options.auditLogPath);
     this.migrationRunner = new MigrationRunner(options.migrations ?? DEFAULT_MIGRATIONS);
     this.schemaVersion = options.schemaVersion ?? CURRENT_SCHEMA_VERSION;

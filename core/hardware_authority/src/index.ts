@@ -12,6 +12,7 @@ export { classifyDevices } from './classification.js';
 export { assessCapabilities, assessHealth } from './assessment.js';
 export { RUNTIME_STATE_TRANSITIONS, assertRuntimeTransition, assertLifecycleTransition } from './stateMachine.js';
 export { BenchmarkRegistry } from './benchmarks.js';
+export { detectDuplicateDeviceIds, detectInventoryInconsistencies, type IntegrityIssue } from './integrity.js';
 export { HARDWARE_EVENTS, HardwareEventBus, type HardwareEventName } from './events.js';
 export { HardwareAuditTrail } from './explainability.js';
 export {
@@ -47,6 +48,7 @@ export type {
   BenchmarkResult,
   BenchmarkSummary,
   DeviceRecord,
+  AllocationRecord,
   ReliabilityRecord,
   EfficiencyProfile,
   SuitabilityScore,

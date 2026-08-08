@@ -54,6 +54,7 @@ export function classifyDevices(raw: RawDiscoverySnapshot): DeviceRecord[] {
       manufacturer: cpu.manufacturer ?? cpu.vendor,
       model: cpu.brand,
       architecture: cpu.family,
+      socket: cpu.socket,
       physicalCores: cpu.physicalCores,
       logicalCores: cpu.cores,
       cacheHierarchyKB: { l1: cpu.cacheL1KB, l2: cpu.cacheL2KB, l3: cpu.cacheL3KB },

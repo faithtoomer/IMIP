@@ -7,6 +7,7 @@ export type HardwareCapability =
   | 'ai-inference'
   | 'ai-training'
   | 'virtualization'
+  | 'general-compute'
   | 'benchmarking'
   | 'thermal-monitoring'
   | 'power-monitoring'
@@ -57,6 +58,7 @@ export interface CpuInfo {
   manufacturer?: string;
   model?: string;
   architecture?: string;
+  socket?: string;
   physicalCores?: number;
   logicalCores?: number;
   cacheHierarchyKB?: { l1?: number; l2?: number; l3?: number };
@@ -127,6 +129,16 @@ export interface NetworkInfo {
 
 export type CategoryInfo = CpuInfo | GpuInfo | AsicInfo | MemoryInfo | StorageInfo | MotherboardInfo | NetworkInfo;
 
+/** §9 — "Allocation: current ownership." Set while a device's lifecycle stage is
+ * 'allocated'; cleared on release. Distinct from RuntimeState's 'reserved', which
+ * is a short-term operational status rather than a recorded ownership grant. */
+export interface AllocationRecord {
+  ownerId: string;
+  ownerAuthority: string;
+  allocatedAt: string;
+  reason: string;
+}
+
 export interface BenchmarkResult {
   deviceId: string;
   workload: string;
@@ -152,6 +164,7 @@ export interface DeviceRecord {
   health: HealthSummary;
   lifecycleStage: LifecycleStage;
   runtimeState: RuntimeState;
+  allocation?: AllocationRecord;
   discoveryTimestamp: string;
   lastUpdated: string;
   owningAuthority: 'Hardware Authority';
@@ -188,6 +201,7 @@ export interface DigitalTwin {
   health: HealthSummary;
   performanceProfile: BenchmarkSummary;
   operationalState: RuntimeState;
+  allocation?: AllocationRecord;
   reliability: ReliabilityRecord;
   efficiency: EfficiencyProfile;
   suitabilityScores: SuitabilityScore[];
@@ -219,6 +233,7 @@ export interface RawCpuInfo {
   brand?: string;
   vendor?: string;
   family?: string;
+  socket?: string;
   physicalCores?: number;
   cores?: number;
   cacheL1KB?: number;

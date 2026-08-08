@@ -10,6 +10,7 @@ export function makeRawSnapshot(overrides: Partial<RawDiscoverySnapshot> = {}): 
         manufacturer: 'AMD',
         brand: 'Ryzen 9 7950X',
         family: 'Zen4',
+        socket: 'AM5',
         physicalCores: 16,
         cores: 32,
         cacheL1KB: 32,

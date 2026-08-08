@@ -7,7 +7,9 @@ import { BenchmarkRegistry } from './benchmarks.js';
 import { HARDWARE_EVENTS, HardwareEventBus, type HardwareEventName } from './events.js';
 import { HardwareAuditTrail } from './explainability.js';
 import { assembleDigitalTwin, computeSuitability, initialReliability, recomputeStabilityScore } from './digitalTwin.js';
+import { detectDuplicateDeviceIds, detectInventoryInconsistencies, type IntegrityIssue } from './integrity.js';
 import { HardwareDiscoveryError } from './errors.js';
+import type { InstitutionalEventBus } from '../../event_bus/src/index.js';
 import type {
   BenchmarkResult,
   DeviceRecord,
@@ -23,6 +25,9 @@ import type {
 
 export interface HardwareAuthorityOptions {
   discoveryProvider?: DiscoveryProvider;
+  /** Shared Institutional Event Bus (PHASE-05) to mirror events onto. Optional —
+   * without it, HardwareEventBus behaves exactly as it did before Phase 05 (ADR-0009). */
+  eventBus?: InstitutionalEventBus;
 }
 
 /**
@@ -36,7 +41,7 @@ export interface HardwareAuthorityOptions {
  */
 export class HardwareAuthority {
   readonly registry = new HardwareRegistry();
-  readonly events = new HardwareEventBus();
+  readonly events: HardwareEventBus;
   readonly audit = new HardwareAuditTrail();
   readonly benchmarks = new BenchmarkRegistry();
 
@@ -47,6 +52,7 @@ export class HardwareAuthority {
 
   constructor(options: HardwareAuthorityOptions = {}) {
     this.discoveryProvider = options.discoveryProvider ?? new SystemInformationDiscoveryProvider();
+    this.events = new HardwareEventBus(options.eventBus);
   }
 
   /** Runs discovery, classifies, assesses capabilities/health, and reconciles against
@@ -72,6 +78,19 @@ export class HardwareAuthority {
 
     const failedCategories = new Set(outcome.failures.map((f) => f.category));
     const classified = classifyDevices(outcome.snapshot);
+
+    for (const duplicate of detectDuplicateDeviceIds(classified)) {
+      this.audit.record({
+        timestamp: now,
+        deviceId: duplicate.deviceId,
+        kind: 'fault-detected',
+        details: { issue: duplicate.issue },
+        reason: 'duplicate-device-id',
+        initiatingAuthority: 'Hardware Authority',
+      });
+      this.events.publish(HARDWARE_EVENTS.HardwareFaultDetected, { deviceId: duplicate.deviceId, reason: duplicate.issue });
+    }
+
     const seenIds = new Set<string>();
 
     for (const raw of classified) {
@@ -93,6 +112,7 @@ export class HardwareAuthority {
       if (!existing) {
         this.reliability.set(record.deviceId, initialReliability(record.deviceId));
         this.advanceLifecycle(record.deviceId, 'registered', 'auto-registered on discovery', 'Hardware Authority');
+        this.events.publish(HARDWARE_EVENTS.DeviceRegistered, { deviceId: record.deviceId });
         this.advanceLifecycle(record.deviceId, 'capability-assessed', 'capabilities assessed on discovery', 'Hardware Authority');
         this.applyRuntimeTransition(record.deviceId, 'available', 'discovered and capability-assessed', 'Hardware Authority');
         this.events.publish(HARDWARE_EVENTS.Discovered, { deviceId: record.deviceId, category: record.category });
@@ -151,6 +171,18 @@ export class HardwareAuthority {
       this.audit.record({ timestamp: now, deviceId: id, kind: 'removed', details: {} });
     }
 
+    for (const issue of detectInventoryInconsistencies(this.registry.all())) {
+      this.audit.record({
+        timestamp: now,
+        deviceId: issue.deviceId,
+        kind: 'fault-detected',
+        details: { issue: issue.issue },
+        reason: 'inventory-inconsistency',
+        initiatingAuthority: 'Hardware Authority',
+      });
+      this.events.publish(HARDWARE_EVENTS.HardwareFaultDetected, { deviceId: issue.deviceId, reason: issue.issue });
+    }
+
     this.snapshotVersion += 1;
     const snapshot: DiscoverySnapshot = Object.freeze({
       version: this.snapshotVersion,
@@ -193,6 +225,12 @@ export class HardwareAuthority {
 
   getDiscoveryHistory(): readonly DiscoverySnapshot[] {
     return this.snapshots;
+  }
+
+  /** §15 — on-demand integrity check over the current registry state, independent
+   * of discovery. The same checks run automatically at the end of every discover(). */
+  checkIntegrity(): IntegrityIssue[] {
+    return detectInventoryInconsistencies(this.registry.all());
   }
 
   /** Read surface for a future Platform Capability Registry to consume (PHASE-01 ADR-0002,
@@ -307,12 +345,23 @@ export class HardwareAuthority {
     this.events.publish(HARDWARE_EVENTS.BenchmarkCompleted, { deviceId: result.deviceId, workload: result.workload });
   }
 
-  allocate(deviceId: string, reason: string, initiatingAuthority: string): DeviceRecord {
-    return this.advanceLifecycle(deviceId, 'allocated', reason, initiatingAuthority);
+  /** §9 Digital Twin "Allocation: current ownership" — records who the device is
+   * allocated to, not just that it advanced to the 'allocated' lifecycle stage. */
+  allocate(deviceId: string, ownerId: string, reason: string, initiatingAuthority: string): DeviceRecord {
+    const advanced = this.advanceLifecycle(deviceId, 'allocated', reason, initiatingAuthority);
+    const withAllocation: DeviceRecord = {
+      ...advanced,
+      allocation: { ownerId, ownerAuthority: initiatingAuthority, allocatedAt: new Date().toISOString(), reason },
+    };
+    this.registry.upsert(withAllocation);
+    return withAllocation;
   }
 
   releaseAllocation(deviceId: string, reason: string, initiatingAuthority: string): DeviceRecord {
-    return this.advanceLifecycle(deviceId, 'released', reason, initiatingAuthority);
+    const advanced = this.advanceLifecycle(deviceId, 'released', reason, initiatingAuthority);
+    const withoutAllocation: DeviceRecord = { ...advanced, allocation: undefined };
+    this.registry.upsert(withoutAllocation);
+    return withoutAllocation;
   }
 
   retire(deviceId: string, reason: string, initiatingAuthority: string): DeviceRecord {

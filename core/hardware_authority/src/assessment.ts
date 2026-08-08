@@ -16,14 +16,16 @@ export function assessCapabilities(device: DeviceRecord): HardwareCapability[] {
   switch (device.category) {
     case 'cpu': {
       const info = device.categoryInfo as CpuInfo;
-      const caps: HardwareCapability[] = ['cpu-mining', 'benchmarking', 'hardware-telemetry'];
+      const caps: HardwareCapability[] = ['cpu-mining', 'general-compute', 'benchmarking', 'hardware-telemetry'];
       if (info.virtualizationSupport) caps.push('virtualization');
       if (info.thermalSensors && info.thermalSensors.length > 0) caps.push('thermal-monitoring');
       return caps;
     }
     case 'gpu': {
       const info = device.categoryInfo as GpuInfo;
-      const caps: HardwareCapability[] = ['benchmarking', 'hardware-telemetry'];
+      // Any recognized GPU is a general compute device by definition, independent of
+      // whether it happens to also qualify for mining/AI workloads below.
+      const caps: HardwareCapability[] = ['general-compute', 'benchmarking', 'hardware-telemetry'];
       if (typeof info.vramMB === 'number') caps.push('gpu-mining');
       // AI capability heuristic: CUDA support, or enough VRAM to be plausibly useful for
       // inference/training workloads. This is a coarse, documented heuristic — real

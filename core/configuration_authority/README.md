@@ -45,6 +45,10 @@ import { ConfigurationAuthority } from './core/configuration_authority/src/index
 const authority = new ConfigurationAuthority({ filePath: './imip.config.json' });
 const snapshot = authority.load();
 
+// Optional (Phase 05): mirror every event onto the shared Institutional Event Bus
+// (core/event_bus/) without changing anything above — pass `eventBus` in options.
+// See docs/phase-05/event-bus-connection.md.
+
 authority.get('platform.locale');
 authority.getCategory('electricity');
 authority.getProvenance('wallet.addresses'); // masked — secret tier

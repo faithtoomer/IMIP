@@ -51,7 +51,7 @@ describe('failure handling (§15 — never crash on a single hardware failure)',
     const authority = new HardwareAuthority({ discoveryProvider: new FakeDiscoveryProvider() });
     await authority.discover();
     const gpu = authority.getCategory('gpu')[0]; // sits at 'capability-assessed', no benchmark recorded yet
-    expect(() => authority.allocate(gpu.deviceId, 'test', 'Mining Authority')).toThrow(HardwareLifecycleError);
+    expect(() => authority.allocate(gpu.deviceId, 'monero-plugin', 'test', 'Mining Authority')).toThrow(HardwareLifecycleError);
   });
 
   it('recordFault() then recordRecovery() correctly sequences faulted -> maintenance, never straight to available', async () => {

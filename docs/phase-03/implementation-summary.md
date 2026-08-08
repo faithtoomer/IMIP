@@ -32,6 +32,24 @@ Phase 03 implements the Institutional Hardware Intelligence System (IHIS) — IM
 
 ---
 
+## 2a. Addendum — Additive Enhancements (2026-08-08)
+
+A follow-up spec revision proposed a more elevated IHIS, overlapping almost entirely with what was already shipped above (same mission, same Laws, same Digital Twin/suitability-scoring concept under a different name). Rather than build a duplicate authority — which would itself violate Law 1 — only the pieces genuinely absent from the original implementation were added:
+
+| Addition | File | Notes |
+|---|---|---|
+| Allocation tracking (`DeviceRecord.allocation`, `DigitalTwin.allocation`) | `types.ts`, `HardwareAuthority.ts`, `digitalTwin.ts` | `allocate()` now takes an `ownerId`; `releaseAllocation()` clears it |
+| `DeviceRegistered` event | `events.ts`, `HardwareAuthority.ts` | Fires once, right after a new device reaches the `registered` lifecycle stage |
+| `general-compute` capability + workload | `types.ts`, `assessment.ts`, `digitalTwin.ts` | Every recognized CPU/GPU gets it, independent of mining/AI eligibility |
+| Duplicate-id / inventory-inconsistency detection | `integrity.ts` (new) | Runs automatically at the end of every `discover()`; also exposed via `checkIntegrity()` |
+| CPU `socket` field | `types.ts`, `discovery.ts`, `classification.ts` | Sourced from `systeminformation` |
+
+Explicitly **not** changed (flagged to the user as needing a decision, not silently applied): the runtime-state model was not restructured to fold in `Discovered`/`Registered` as runtime states, and capability registration into the Platform Capability Registry was not changed from "read surface for later" to "register now" — PCR remains reserved (ADR-0002). Event renames (`CapabilityChanged`→`CapabilityRegistered`, `BenchmarkCompleted`→`BenchmarkUpdated`) were also left as-is since they're cosmetic, not missing functionality.
+
+20 new tests across 4 new files (`allocation.test.ts`, `deviceRegistered.test.ts`, `generalCompute.test.ts`, `integrity.test.ts`) plus extensions to `classification.test.ts` and `failure-scenarios.test.ts`. Total: 95 tests across 15 files for IHIS (176 with ICMS).
+
+---
+
 ## 3. Key Decisions
 
 1. **Real discovery via `systeminformation`, not hand-rolled OS shell-outs.** Adopted as a production dependency, same posture as `express`/`pg`/`ws` in the sibling `trading-server`. See ADR-0008.
@@ -48,7 +66,7 @@ Phase 03 implements the Institutional Hardware Intelligence System (IHIS) — IM
 npx tsc --noEmit -p tsconfig.json        → clean (src)
 npx tsc --noEmit (src + tests combined)   → clean
 npm run build                             → dist/ emitted successfully
-npx vitest run                            → 24 files, 156 tests, 156 passed (75 new for Phase 03)
+npx vitest run                            → 28 files, 176 tests, 176 passed (95 for Phase 03 IHIS)
 ```
 
 ---

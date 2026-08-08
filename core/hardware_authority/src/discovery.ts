@@ -103,6 +103,7 @@ export class SystemInformationDiscoveryProvider implements DiscoveryProvider {
         brand: info.brand,
         vendor: info.vendor,
         family: info.family,
+        socket: (info as unknown as { socket?: string }).socket,
         physicalCores: info.physicalCores,
         cores: info.cores,
         cacheL1KB: (info as unknown as { cache?: { l1d?: number } }).cache?.l1d,

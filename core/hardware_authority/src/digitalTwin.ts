@@ -10,7 +10,15 @@ import type {
   SuitabilityScore,
 } from './types.js';
 
-const WORKLOAD_CAPABILITIES: HardwareCapability[] = ['cpu-mining', 'gpu-mining', 'asic-mining', 'ai-inference', 'ai-training', 'virtualization'];
+const WORKLOAD_CAPABILITIES: HardwareCapability[] = [
+  'cpu-mining',
+  'gpu-mining',
+  'asic-mining',
+  'ai-inference',
+  'ai-training',
+  'virtualization',
+  'general-compute',
+];
 
 function healthFactor(health: HealthSummary): number {
   switch (health.status) {
@@ -120,6 +128,7 @@ export function assembleDigitalTwin(
     health: device.health,
     performanceProfile: benchmarks,
     operationalState: device.runtimeState,
+    allocation: device.allocation,
     reliability,
     efficiency: computeEfficiencyProfile(device, benchmarks),
     suitabilityScores,

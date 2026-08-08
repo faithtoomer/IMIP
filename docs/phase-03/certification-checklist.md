@@ -16,7 +16,7 @@
 | Hardware events are published correctly | YES | `src/events.ts`; `tests/events.test.ts` |
 | Explainability is complete | YES | `src/explainability.ts` + `getDigitalTwin()`; `tests/explainability.test.ts` |
 | Read-only interfaces are implemented | YES | `HardwareAuthority` read API; mutation only via named workflows |
-| Tests pass | YES | 11 files / 75 tests (156 total with Phase 02), `npx vitest run` |
+| Tests pass | YES | 15 files / 95 tests (176 total with Phase 02), `npx vitest run` |
 | Documentation is complete | YES | `core/hardware_authority/README.md`, this directory |
 
 ## Institutional Completion Standard (§18 contract)
@@ -38,6 +38,17 @@
 | Suitability scores per workload, not device identity | YES — `computeSuitability()`, `rankForWorkload()` |
 | Scoring is deterministic and explainable | YES — weighted-factor formula with `explanation` array on every score |
 
+## Addendum — Additive Enhancements (2026-08-08)
+
+| Requirement | Certified |
+|---|---|
+| Allocation (current ownership) on the Digital Twin | YES — `tests/allocation.test.ts` |
+| `DeviceRegistered` event | YES — `tests/deviceRegistered.test.ts` |
+| `general-compute` capability + workload suitability | YES — `tests/generalCompute.test.ts` |
+| Duplicate-device-id and inventory-inconsistency detection | YES — `src/integrity.ts`, `tests/integrity.test.ts` |
+| CPU `socket` field | YES — `tests/classification.test.ts` |
+| No duplicate hardware authority created alongside IHIS | YES — additions applied in place to the existing module |
+
 ## Certification Statement
 
-Phase 03 — Institutional Hardware Intelligence System (IHIS) — is **CERTIFIED COMPLETE** for repository `faithtoomer/IMIP` as of 2026-08-07. Type-check (src + tests), build, and the full 156-test suite (75 new for Phase 03) pass.
+Phase 03 — Institutional Hardware Intelligence System (IHIS) — is **CERTIFIED COMPLETE** for repository `faithtoomer/IMIP` as of 2026-08-07, with additive enhancements certified 2026-08-08. Type-check (src + tests), build, and the full 176-test suite (95 for IHIS) pass.

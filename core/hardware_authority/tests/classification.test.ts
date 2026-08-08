@@ -12,10 +12,11 @@ describe('classifyDevices (§6)', () => {
 
   it('maps CPU fields per §6', () => {
     const [cpu] = classifyDevices(makeRawSnapshot()).filter((d) => d.category === 'cpu');
-    const info = cpu.categoryInfo as { physicalCores?: number; logicalCores?: number; instructionSets?: string[] };
+    const info = cpu.categoryInfo as { physicalCores?: number; logicalCores?: number; instructionSets?: string[]; socket?: string };
     expect(info.physicalCores).toBe(16);
     expect(info.logicalCores).toBe(32);
     expect(info.instructionSets).toEqual(['aes', 'avx2', 'sse4_2']);
+    expect(info.socket).toBe('AM5');
   });
 
   it('maps GPU fields per §6', () => {
