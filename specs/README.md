@@ -11,6 +11,7 @@ These are the only documents Cursor may implement.
 | `PHASE-00-repository-governance.md` | APPROVED FOR IMPLEMENTATION |
 | `PHASE-01-institutional-system-architecture-runtime-blueprint.md` | APPROVED FOR IMPLEMENTATION |
 | `PHASE-02-configuration-authority.md` | APPROVED FOR IMPLEMENTATION |
+| `PHASE-03-hardware-intelligence-system.md` | APPROVED FOR IMPLEMENTATION |
 
 ## Rules
 

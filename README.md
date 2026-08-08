@@ -11,6 +11,7 @@ IMIP is an institutional platform architecture for multi-engine, multi-hardware,
 | 00 | Repository Governance & Institutional Architecture | Established |
 | 01 | Institutional System Architecture & Runtime Blueprint | Established |
 | 02 | Institutional Configuration Management System (ICMS) — Single Source of Truth | Implemented (v2.0) |
+| 03 | Institutional Hardware Intelligence System (IHIS) — Hardware Authority | Implemented |
 
 ## Repository Architecture
 
@@ -21,7 +22,8 @@ IMIP/
 ├── core/             # Institutional platform logic (never coin/miner logic)
 │   ├── capability_registry/   # Reserved — Platform Capability Registry (PCR)
 │   ├── policy_engine/         # Reserved — Policy Authority (Phase 01)
-│   └── configuration_authority/  # Implemented — Single Source of Truth (Phase 02)
+│   ├── configuration_authority/  # Implemented — Single Source of Truth (Phase 02)
+│   └── hardware_authority/       # Implemented — Hardware Intelligence / Digital Twin (Phase 03)
 ├── plugins/          # Mining implementations by capability class
 │   ├── cpu/
 │   │   └── monero/
@@ -59,6 +61,10 @@ The complete runtime blueprint (topology, authority hierarchy, decision pipeline
 ## Phase 02 — Institutional Configuration Management System (ICMS)
 
 ICMS (`core/configuration_authority/`) is IMIP's first implemented module and institutional Single Source of Truth: staged 9-phase validation, immutable content-addressed snapshots with rollback, per-key provenance, a migration framework, and 5-tier secret classification. Node.js (ESM) + TypeScript; run `npm install && npm test` to verify (81 tests). See `core/configuration_authority/README.md` and `docs/phase-02/` for the implementation summary, the Configuration/Policy/Operational-State boundary mapping, and the certification checklist.
+
+## Phase 03 — Institutional Hardware Intelligence System (IHIS)
+
+IHIS (`core/hardware_authority/`) is IMIP's Hardware Authority: real cross-platform discovery (CPU/GPU/ASIC-ready/memory/storage/motherboard/network), capability-first assessment (never device-name lookups), runtime state + lifecycle tracking, and a Digital Twin that scores hardware suitability per workload from health, availability, and reliability rather than identity. See `core/hardware_authority/README.md` and `docs/phase-03/` for the implementation summary and certification checklist.
 
 ### Local Development
 
