@@ -19,6 +19,8 @@ export type DataDomain =
   | 'benchmark-results'
   | 'arbitration-registry'
   | 'arbitration-history'
+  | 'certification-registry'
+  | 'certification-history'
   | 'workload-registry'
   | 'workload-history'
   | 'health-registry'

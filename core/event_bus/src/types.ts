@@ -9,6 +9,7 @@ export type EventCategory =
   | 'workload'
   | 'benchmark'
   | 'arbitration'
+  | 'certification'
   | 'power'
   | 'thermal'
   | 'health'
