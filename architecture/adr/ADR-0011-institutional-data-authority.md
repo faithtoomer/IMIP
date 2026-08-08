@@ -1,0 +1,27 @@
+# ADR-0011: Institutional Data Authority
+
+**Status:** Accepted  
+**Date:** 2026-08-08  
+**Phase:** 08  
+**Deciders:** Architectural Authority (Specification)
+
+## Context
+
+Phase 08 is Program II's first phase and introduces IMIP's first real persistence layer. Two prior precedents shaped the design space: Law 2 (storage-technology independence, already established for hardware/config abstractions) and the mirror/bridge pattern from ADR-0009, which showed that a new authority with no legacy synchronous API to preserve should integrate directly rather than through a compatibility shim. IDA has no legacy constraint of its own — it is new — so the open questions were about the shape of its own internals: how to keep the platform storage-technology-independent in practice (not just in principle), how to make optimistic concurrency actually correct, and how to reconcile "schema version" with "record revision," two concepts the initial draft conflated.
+
+## Decisions
+
+1. **All SQL confined to one file.** `SqliteStorageProvider` (`sqliteStorageProvider.ts`) is the only file in `core/data_authority/` permitted to contain SQL; everything else — `DataAuthority`, `SchemaManager`, `TransactionManager`, `DataAuditTrail`, `KnowledgeGraph` — depends only on the `StorageProvider` interface. Swapping backends is a one-file change with no ripple effect, mirroring the Law 2 discipline already applied to hardware/config abstractions.
+2. **Node's built-in `node:sqlite` (`DatabaseSync`) as the default `StorageProvider`**, not an external dependency. Real nested transactions via manual `SAVEPOINT`/`RELEASE SAVEPOINT`/`ROLLBACK TO SAVEPOINT`, `json_extract` (JSON1) for querying the opaque JSON `data` blob, `VACUUM INTO` for atomic backups, `PRAGMA integrity_check` for backup validation.
+3. **`version` (schema version) and `revision` (optimistic-concurrency counter) are two separate fields**, not one overloaded field. This was caught during implementation, before it shipped: an early draft used a single `version` field for both "which schema shape does this record's data conform to" and "how many times has this record been written," which would have made a schema migration silently look like a concurrency conflict (or vice versa). `DataRecord.version` now tracks schema conformance only; `DataRecord.revision` is a monotonic per-record counter, starting at 1 on create and incremented on every update, used exclusively by `OptimisticConcurrencyError`.
+4. **Concurrency control compares `revision`, not `updatedAt`.** An initial implementation compared timestamps (`new Date().toISOString()`), which was caught as a real bug by the test suite: two updates to the same record executing within the same millisecond produce identical ISO strings, so a stale-write check based on wall-clock time silently passes the stale write through. A monotonic integer counter has no such collision window regardless of write throughput or clock resolution.
+5. **Governance columns (`id`, `version`, `revision`, `lifecycleStage`, `createdAt`, `updatedAt`) resolve to real SQL columns; everything else resolves through `json_extract` against the opaque `data` blob.** An initial implementation routed every query field — including governance fields — through `json_extract(data, '$.field')`, which silently matched nothing for any governance-field filter or sort, because those fields live in real columns, not inside `data`. Caught by `DataAuthority.purge()`'s own test (a `createdAt` cutoff filter returned zero rows instead of the expected two). Fixed with a single `resolveColumn()` used by both `buildWhere()` and `ORDER BY`, keeping the safe-identifier validation (SQL-injection defense) on the fallback path.
+6. **Audit recording is always its own transaction, separate from the transaction it describes** — carried over directly from the pattern IDA itself defines for every other authority (§13): a failed `create`/`update`/`delete` must still produce a permanent audit record, which would not survive being rolled back together with the change it failed to make.
+7. **The Institutional Knowledge Model (IKM) is built now, not deferred.** Unlike Phase 05's Event Intelligence & Correlation Engine (reserved, ADR-0009), the spec did not mark IKM as a future enhancement — it names it as core Phase 08 scope. `KnowledgeGraph` is generic (no hardcoded relationship-type list or domain-pairing logic), so every example pairing the spec names (Hardware ↔ Capabilities, Plugins ↔ Capabilities, Decisions ↔ Explainability, Mining Sessions ↔ Profitability) works today with zero code changes, the moment those domains hold real data.
+
+## Consequences
+
+- Adding a new persistent domain is a `registerDomainSchema()` call, not a new table-specific class — the same generic-repository discipline used by `ConfigurationRegistry`/`HardwareRegistry`/`EventRegistry`.
+- Replacing SQLite with another backend touches exactly one file (`sqliteStorageProvider.ts`) and its tests; no other module in `core/data_authority/` or any consumer of `DataAuthority` needs to change.
+- Any authority that needs to relate two persisted entities — across domains or within one — can do so immediately via `ida.knowledge.link()`, with no per-relationship-type plumbing to add.
+- Two real logic bugs (the timestamp-collision concurrency check, and the governance-column query routing) were caught by the test suite before certification, not discovered later in integration — both are documented here rather than silently patched.
