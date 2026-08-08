@@ -12,6 +12,9 @@ IMIP is an institutional platform architecture for multi-engine, multi-hardware,
 | 01 | Institutional System Architecture & Runtime Blueprint | Established |
 | 02 | Institutional Configuration Management System (ICMS) — Single Source of Truth | Implemented (v2.0) |
 | 03 | Institutional Hardware Intelligence System (IHIS) — Hardware Authority | Implemented |
+| 16 | Institutional Power Intelligence Authority (IPIA) + Energy Digital Twin | Implemented |
+| 17 | Institutional Thermal Intelligence Authority (ITIA) + Thermal Digital Twin | Implemented |
+| 18 | Institutional Resource Intelligence Authority (IRIA) + Resource Digital Twin | Implemented |
 
 ## Repository Architecture
 
@@ -22,8 +25,11 @@ IMIP/
 ├── core/             # Institutional platform logic (never coin/miner logic)
 │   ├── capability_registry/   # Reserved — Platform Capability Registry (PCR)
 │   ├── policy_engine/         # Reserved — Policy Authority (Phase 01)
-│   ├── configuration_authority/  # Implemented — Single Source of Truth (Phase 02)
-│   └── hardware_authority/       # Implemented — Hardware Intelligence / Digital Twin (Phase 03)
+│   ├── configuration_authority/  # Implemented — ICMS / SSOT (Phase 02)
+│   ├── hardware_authority/       # Implemented — IHIS / Hardware Digital Twin (Phase 03)
+│   ├── power_authority/          # Implemented — IPIA / Energy Digital Twin (Phase 16)
+│   ├── thermal_authority/        # Implemented — ITIA / Thermal Digital Twin (Phase 17)
+│   └── resource_authority/       # Implemented — IRIA / Resource Digital Twin (Phase 18)
 ├── plugins/          # Mining implementations by capability class
 │   ├── cpu/
 │   │   └── monero/
@@ -65,6 +71,16 @@ ICMS (`core/configuration_authority/`) is IMIP's first implemented module and in
 ## Phase 03 — Institutional Hardware Intelligence System (IHIS)
 
 IHIS (`core/hardware_authority/`) is IMIP's Hardware Authority: real cross-platform discovery (CPU/GPU/ASIC-ready/memory/storage/motherboard/network), capability-first assessment (never device-name lookups), runtime state + lifecycle tracking, and a Digital Twin that scores hardware suitability per workload from health, availability, and reliability rather than identity. See `core/hardware_authority/README.md` and `docs/phase-03/` for the implementation summary and certification checklist.
+
+## Program III — Resource Intelligence (Phases 16–18)
+
+| Authority | Module | Twin | Role |
+|-----------|--------|------|------|
+| IPIA | `core/power_authority/` | IEDT | Power monitoring, cost/efficiency, budgets, advisory recommendations |
+| ITIA | `core/thermal_authority/` | ITDT | Thermal telemetry, trends/forecasts/anomalies, advisory recommendations |
+| IRIA | `core/resource_authority/` | IRDT | Resource registry, allocation/reservation/ownership, capacity forecasting |
+
+These authorities treat power, thermal behavior, and allocatable capacity as managed institutional resources. They observe, analyze, and recommend — they never directly mutate power limits, fans, clocks, or voltages. See `docs/phase-16/`, `docs/phase-17/`, `docs/phase-18/`, and ADRs 0009–0011.
 
 ### Local Development
 

@@ -20,8 +20,9 @@ Full authority contracts (Responsibilities, Owned State, Dependencies, Published
 | Mining Authority | Institutional Authority | Owns authorization and control of mining operations via the Mining Adapter Layer. |
 | Decision Intelligence Authority | Decision | Owns the Decision Engine, decision graph, and policy evaluation orchestration. |
 | Profitability Authority | Institutional Authority | Owns profitability calculation and evaluation. |
-| Power Authority | Institutional Authority | Owns power management and power-based decision input. |
-| Thermal Authority | Institutional Authority | Owns thermal safety evaluation and thermal state. |
+| Power Authority (IPIA) | Institutional Authority | Owns power monitoring, energy cost/efficiency analysis, power budgeting, advisory power recommendations, and the Institutional Energy Digital Twin (IEDT). Implemented as IPIA (`core/power_authority/`, PHASE-16). |
+| Thermal Authority (ITIA) | Institutional Authority | Owns thermal telemetry, trend/forecast/anomaly analysis, thermal budgeting, advisory thermal recommendations, and the Institutional Thermal Digital Twin (ITDT). Implemented as ITIA (`core/thermal_authority/`, PHASE-17). |
+| Resource Authority (IRIA) | Institutional Authority | Owns resource registry, availability, allocation, reservation, ownership/leasing, utilization, capacity forecasting, and the Institutional Resource Digital Twin (IRDT). Implemented as IRIA (`core/resource_authority/`, PHASE-18). |
 | Health Authority | Institutional Authority | Owns platform and plugin health monitoring. |
 | Scheduler Authority | Institutional Authority | Owns mining schedules and workload timing. |
 | Telemetry Authority | Institutional Authority | Owns telemetry collection and distribution. |
