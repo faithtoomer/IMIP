@@ -1,13 +1,14 @@
 import { existsSync, readFileSync } from 'node:fs';
 import type { ConfigValues, ConfigSourceName } from './types.js';
 import type { ConfigurationRegistry } from './registry.js';
+import { ConfigurationSyntaxError } from './errors.js';
 
 /**
- * Deterministic source precedence (PHASE-02 §7):
+ * Deterministic source precedence (PHASE-02 §9):
  *   1. Command-line arguments
  *   2. Environment variables
- *   3. Configuration file
- *   4. Secure secrets store
+ *   3. Secure secrets store
+ *   4. Configuration file
  *   5. Built-in defaults (registry defaultValue)
  */
 export interface SecretsProvider {
@@ -70,16 +71,24 @@ function parseEnv(registry: ConfigurationRegistry, env: NodeJS.ProcessEnv): Conf
   return out;
 }
 
+/** Stage 1 (Syntax): a malformed config file is a syntax failure, not a thrown crash. */
 function loadFile(filePath: string | undefined): ConfigValues {
   if (!filePath || !existsSync(filePath)) return {};
   const raw = readFileSync(filePath, 'utf-8');
-  return JSON.parse(raw) as ConfigValues;
+  try {
+    return JSON.parse(raw) as ConfigValues;
+  } catch (error) {
+    throw new ConfigurationSyntaxError(
+      `Failed to parse configuration file "${filePath}" as JSON: ${(error as Error).message}`,
+      filePath,
+    );
+  }
 }
 
 function loadSecrets(registry: ConfigurationRegistry, provider: SecretsProvider): ConfigValues {
   const out: ConfigValues = {};
   for (const entry of registry.all()) {
-    if (entry.securityClassification !== 'sensitive') continue;
+    if (entry.securityClassification === 'public' || entry.securityClassification === 'internal') continue;
     const value = provider.get(entry.id);
     if (value !== undefined) out[entry.id] = value;
   }
@@ -92,8 +101,8 @@ export function resolveConfigValues(
 ): { values: ConfigValues; resolution: ResolvedValue[] } {
   const cli = parseCliArgs(options.argv ?? process.argv.slice(2));
   const env = parseEnv(registry, options.env ?? process.env);
-  const file = loadFile(options.filePath);
   const secrets = loadSecrets(registry, options.secretsProvider ?? new NoopSecretsProvider());
+  const file = loadFile(options.filePath);
 
   const values: ConfigValues = {};
   const resolution: ResolvedValue[] = [];
@@ -108,12 +117,12 @@ export function resolveConfigValues(
     } else if (Object.prototype.hasOwnProperty.call(env, entry.id)) {
       value = env[entry.id];
       source = 'env';
-    } else if (Object.prototype.hasOwnProperty.call(file, entry.id)) {
-      value = file[entry.id];
-      source = 'file';
     } else if (Object.prototype.hasOwnProperty.call(secrets, entry.id)) {
       value = secrets[entry.id];
       source = 'secrets';
+    } else if (Object.prototype.hasOwnProperty.call(file, entry.id)) {
+      value = file[entry.id];
+      source = 'file';
     } else {
       value = entry.defaultValue;
       source = 'default';

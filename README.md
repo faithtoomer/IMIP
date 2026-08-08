@@ -10,7 +10,7 @@ IMIP is an institutional platform architecture for multi-engine, multi-hardware,
 |-------|------|--------|
 | 00 | Repository Governance & Institutional Architecture | Established |
 | 01 | Institutional System Architecture & Runtime Blueprint | Established |
-| 02 | Configuration Authority (Single Source of Truth) | Implemented |
+| 02 | Institutional Configuration Management System (ICMS) — Single Source of Truth | Implemented (v2.0) |
 
 ## Repository Architecture
 
@@ -56,9 +56,9 @@ See `docs/phase-00/` for the migration report, validation report, and certificat
 
 The complete runtime blueprint (topology, authority hierarchy, decision pipeline, event model, dependency laws, explainability pipeline, AI boundaries) is defined in `architecture/RUNTIME_ARCHITECTURE.md` and `architecture/AUTHORITY_REGISTRY.md`. See `docs/phase-01/` for the deliverable summary and certification checklist.
 
-## Phase 02 — Configuration Authority
+## Phase 02 — Institutional Configuration Management System (ICMS)
 
-The Configuration Authority (`core/configuration_authority/`) is IMIP's first implemented module and institutional Single Source of Truth. Node.js (ESM) + TypeScript; run `npm install && npm test` to verify. See `core/configuration_authority/README.md` and `docs/phase-02/` for the implementation summary, the Configuration/Policy boundary mapping, and the certification checklist.
+ICMS (`core/configuration_authority/`) is IMIP's first implemented module and institutional Single Source of Truth: staged 9-phase validation, immutable content-addressed snapshots with rollback, per-key provenance, a migration framework, and 5-tier secret classification. Node.js (ESM) + TypeScript; run `npm install && npm test` to verify (81 tests). See `core/configuration_authority/README.md` and `docs/phase-02/` for the implementation summary, the Configuration/Policy/Operational-State boundary mapping, and the certification checklist.
 
 ### Local Development
 

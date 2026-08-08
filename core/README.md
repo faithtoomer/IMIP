@@ -52,4 +52,4 @@ Runtime architecture (topology, layers, lifecycle, dependency laws, decision pip
 
 ## Phase 02
 
-`core/configuration_authority/` is the first implemented core module — the institutional Single Source of Truth. See `configuration_authority/README.md`, `architecture/adr/ADR-0005-configuration-authority-ssot.md`, and `architecture/adr/ADR-0006-configuration-policy-boundary.md`.
+`core/configuration_authority/` is the first implemented core module — the Institutional Configuration Management System (ICMS), the institutional Single Source of Truth. See `configuration_authority/README.md`, `architecture/adr/ADR-0005-configuration-authority-ssot.md`, `architecture/adr/ADR-0006-configuration-policy-boundary.md`, and `architecture/adr/ADR-0007-configuration-policy-operational-state.md`.

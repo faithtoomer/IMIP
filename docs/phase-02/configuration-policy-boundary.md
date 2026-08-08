@@ -1,8 +1,8 @@
 # Phase 02 — Configuration / Policy Boundary Mapping
 
-**Authority:** PHASE-02 §16 / ADR-0006
+**Authority:** PHASE-02 §20 / ADR-0006 / ADR-0007
 
-Full key-by-key disposition of every value listed in the PHASE-02 §3 draft.
+Full key-by-key disposition of every value listed in the original PHASE-02 v1.0 §3 draft. As of v2.0 (ICMS), this is now one half of a three-way split — see ADR-0007 for the added Operational State category and `security-classification.md` for the current 5-tier classification (superseding the "sensitive" tag used below, which now maps to secret/restricted).
 
 ## Implemented as Configuration (`core/configuration_authority/src/registry.ts`)
 
@@ -13,7 +13,7 @@ Full key-by-key disposition of every value listed in the PHASE-02 §3 draft.
 | Electricity | rate, currency, billingModel, timeOfUseSchedule, peakPricing, offPeakPricing |
 | Hardware | reservedCpuCores, reservedGpus |
 | Pools | endpoints, backupPools, poolPriorities |
-| Wallet | addresses (sensitive), payoutPreferences (sensitive), minimumPayout, labels |
+| Wallet | addresses (secret), payoutPreferences (restricted), minimumPayout, labels |
 | AI | enabled, provider, modelSelection, recommendationConfidenceThreshold, learningMode, historicalWindow |
 | Dashboard | refreshInterval, theme, notificationPreferences, metricsDisplayed |
 | Database | storageBackend, retentionPeriod, compression, backupInterval |
@@ -43,3 +43,7 @@ These values have no owner until an approved Policy Authority specification impl
 ## Categories reserved, not yet populated
 
 `security`, `notifications`, `plugins` (populated per-plugin via `pluginConfig.ts`, none registered by core in Phase 02), and `policies` (intentionally empty — policy *values* belong to the Policy Authority, not Configuration).
+
+## Third category: Operational State (ADR-0007)
+
+Live/observed values — current temperature, active miner, current profitability, live hash rate — belong to neither Configuration nor Policy. They are Operational State, owned by future Telemetry/Health/Profitability/Mining Authorities. ICMS's own "which snapshot is active" is the sole self-referential exception and must not expand into a general operational-state store.

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ConfigurationAuthority } from '../src/ConfigurationAuthority.js';
 
-describe('explainability / audit trail (§12)', () => {
+describe('explainability / audit trail (§16 change auditing)', () => {
   it('records every required field on a successful update', () => {
     const authority = new ConfigurationAuthority({ argv: [], env: {} });
     authority.load();
@@ -42,5 +42,17 @@ describe('explainability / audit trail (§12)', () => {
     authority.requestUpdate('platform.debugMode', true, 'enable debug logging', 'Dashboard');
 
     expect(authority.audit.all().length).toBe(before + 1);
+  });
+
+  it('a rollback produces its own audit record', () => {
+    const authority = new ConfigurationAuthority({ argv: [], env: {} });
+    const first = authority.load();
+    authority.requestUpdate('platform.debugMode', true, 'enable debug logging', 'Dashboard');
+
+    authority.rollback(first.version, 'revert debug flag', 'Dashboard');
+
+    const records = authority.audit.forKey('__snapshot__');
+    expect(records.length).toBe(1);
+    expect(records[0].newValue).toBe(first.version);
   });
 });

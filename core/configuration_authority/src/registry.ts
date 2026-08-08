@@ -1,5 +1,10 @@
 import type { ConfigCategory, ConfigEntry } from './types.js';
 
+/** ICMS schema version (§14). Bumped from 1.0.0 to 2.0.0 for the security-classification
+ * model upgrade (public/sensitive -> five-tier). No value shapes changed, so no
+ * value migration is required for this bump — see migrations.ts. */
+export const CURRENT_SCHEMA_VERSION = '2.0.0';
+
 /**
  * SSOT enforcement: every configuration key has exactly one registered owner.
  * Registering a duplicate id is a governance violation and throws.
@@ -10,7 +15,7 @@ export class ConfigurationRegistry {
   register(entry: ConfigEntry): void {
     if (this.entries.has(entry.id)) {
       throw new Error(
-        `Configuration Authority violation: duplicate key "${entry.id}". Every configuration value has exactly one owner.`,
+        `ICMS violation: duplicate key "${entry.id}". Every configuration value has exactly one owner.`,
       );
     }
     this.entries.set(entry.id, entry);
@@ -44,13 +49,17 @@ export class ConfigurationRegistry {
 }
 
 /**
- * Master Configuration Authority registry (PHASE-02 §3, §6).
+ * Master ICMS registry (PHASE-02 §3, §7, §8).
  *
  * Scope note (ADR-0006): only pure system-state values are registered here.
  * Conditional/operational rules (profitability thresholds, thermal/power limits,
- * schedules, auto-start/stop, failover behavior, hardware reservation *strategy*)
- * are deferred to the future Policy Authority per the Architect's Enhancement in
- * PHASE-02. See docs/phase-02/configuration-policy-boundary.md for the full mapping.
+ * schedules, auto-start/stop, failover behavior) are deferred to the future
+ * Policy Authority. See docs/phase-02/configuration-policy-boundary.md.
+ *
+ * Classification note (ADR-0008): public/internal entries are infrastructure or
+ * business detail, not visible on external-facing surfaces but not masked in
+ * internal logs. confidential/restricted/secret entries are masked everywhere
+ * (see security.ts shouldMask). See docs/phase-02/security-classification.md.
  */
 export const DEFAULT_ENTRIES: ConfigEntry[] = [
   // ---- Platform ----
@@ -196,7 +205,7 @@ export const DEFAULT_ENTRIES: ConfigEntry[] = [
     owner: 'Configuration Authority',
     runtimeMutability: 'hot-reloadable',
     versionIntroduced: '1.0.0',
-    securityClassification: 'public',
+    securityClassification: 'internal',
   },
   {
     id: 'electricity.currency',
@@ -207,7 +216,7 @@ export const DEFAULT_ENTRIES: ConfigEntry[] = [
     owner: 'Configuration Authority',
     runtimeMutability: 'hot-reloadable',
     versionIntroduced: '1.0.0',
-    securityClassification: 'public',
+    securityClassification: 'internal',
   },
   {
     id: 'electricity.billingModel',
@@ -219,7 +228,7 @@ export const DEFAULT_ENTRIES: ConfigEntry[] = [
     owner: 'Configuration Authority',
     runtimeMutability: 'hot-reloadable',
     versionIntroduced: '1.0.0',
-    securityClassification: 'public',
+    securityClassification: 'internal',
   },
   {
     id: 'electricity.timeOfUseSchedule',
@@ -230,7 +239,7 @@ export const DEFAULT_ENTRIES: ConfigEntry[] = [
     owner: 'Configuration Authority',
     runtimeMutability: 'hot-reloadable',
     versionIntroduced: '1.0.0',
-    securityClassification: 'public',
+    securityClassification: 'internal',
   },
   {
     id: 'electricity.peakPricing',
@@ -242,7 +251,7 @@ export const DEFAULT_ENTRIES: ConfigEntry[] = [
     owner: 'Configuration Authority',
     runtimeMutability: 'hot-reloadable',
     versionIntroduced: '1.0.0',
-    securityClassification: 'public',
+    securityClassification: 'internal',
   },
   {
     id: 'electricity.offPeakPricing',
@@ -254,7 +263,7 @@ export const DEFAULT_ENTRIES: ConfigEntry[] = [
     owner: 'Configuration Authority',
     runtimeMutability: 'hot-reloadable',
     versionIntroduced: '1.0.0',
-    securityClassification: 'public',
+    securityClassification: 'internal',
     validate: (value, all) => {
       if (
         all['electricity.billingModel'] === 'time-of-use' &&
@@ -302,7 +311,7 @@ export const DEFAULT_ENTRIES: ConfigEntry[] = [
     owner: 'Configuration Authority',
     runtimeMutability: 'hot-reloadable',
     versionIntroduced: '1.0.0',
-    securityClassification: 'public',
+    securityClassification: 'internal',
   },
   {
     id: 'pools.backupPools',
@@ -313,7 +322,7 @@ export const DEFAULT_ENTRIES: ConfigEntry[] = [
     owner: 'Configuration Authority',
     runtimeMutability: 'hot-reloadable',
     versionIntroduced: '1.0.0',
-    securityClassification: 'public',
+    securityClassification: 'internal',
   },
   {
     id: 'pools.poolPriorities',
@@ -324,31 +333,31 @@ export const DEFAULT_ENTRIES: ConfigEntry[] = [
     owner: 'Configuration Authority',
     runtimeMutability: 'hot-reloadable',
     versionIntroduced: '1.0.0',
-    securityClassification: 'public',
+    securityClassification: 'internal',
   },
 
   // ---- Wallet ----
   {
     id: 'wallet.addresses',
     category: 'wallet',
-    description: 'Wallet addresses (sensitive)',
+    description: 'Wallet addresses (secret)',
     dataType: 'array',
     defaultValue: [],
     owner: 'Configuration Authority',
     runtimeMutability: 'authorized-update-only',
     versionIntroduced: '1.0.0',
-    securityClassification: 'sensitive',
+    securityClassification: 'secret',
   },
   {
     id: 'wallet.payoutPreferences',
     category: 'wallet',
-    description: 'Payout preferences (sensitive)',
+    description: 'Payout preferences (restricted)',
     dataType: 'object',
     defaultValue: {},
     owner: 'Configuration Authority',
     runtimeMutability: 'authorized-update-only',
     versionIntroduced: '1.0.0',
-    securityClassification: 'sensitive',
+    securityClassification: 'restricted',
   },
   {
     id: 'wallet.minimumPayout',
@@ -371,7 +380,7 @@ export const DEFAULT_ENTRIES: ConfigEntry[] = [
     owner: 'Configuration Authority',
     runtimeMutability: 'hot-reloadable',
     versionIntroduced: '1.0.0',
-    securityClassification: 'public',
+    securityClassification: 'internal',
   },
 
   // ---- AI ----
@@ -395,7 +404,7 @@ export const DEFAULT_ENTRIES: ConfigEntry[] = [
     owner: 'Configuration Authority',
     runtimeMutability: 'hot-reloadable',
     versionIntroduced: '1.0.0',
-    securityClassification: 'public',
+    securityClassification: 'internal',
   },
   {
     id: 'ai.modelSelection',
@@ -406,7 +415,7 @@ export const DEFAULT_ENTRIES: ConfigEntry[] = [
     owner: 'Configuration Authority',
     runtimeMutability: 'hot-reloadable',
     versionIntroduced: '1.0.0',
-    securityClassification: 'public',
+    securityClassification: 'internal',
   },
   {
     id: 'ai.recommendationConfidenceThreshold',
@@ -511,7 +520,7 @@ export const DEFAULT_ENTRIES: ConfigEntry[] = [
     owner: 'Configuration Authority',
     runtimeMutability: 'authorized-update-only',
     versionIntroduced: '1.0.0',
-    securityClassification: 'public',
+    securityClassification: 'internal',
   },
   {
     id: 'database.retentionPeriod',

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ConfigurationRegistry, DEFAULT_ENTRIES } from '../src/registry.js';
+import { ConfigurationRegistry, DEFAULT_ENTRIES, CURRENT_SCHEMA_VERSION } from '../src/registry.js';
 
 describe('ConfigurationRegistry', () => {
   it('registers every default entry exactly once (SSOT)', () => {
@@ -31,5 +31,16 @@ describe('ConfigurationRegistry', () => {
     for (const entry of DEFAULT_ENTRIES) {
       expect(entry.owner).toBeTruthy();
     }
+  });
+
+  it('every entry declares a five-tier security classification', () => {
+    const validTiers = new Set(['public', 'internal', 'confidential', 'restricted', 'secret']);
+    for (const entry of DEFAULT_ENTRIES) {
+      expect(validTiers.has(entry.securityClassification)).toBe(true);
+    }
+  });
+
+  it('declares a current schema version', () => {
+    expect(CURRENT_SCHEMA_VERSION).toBe('2.0.0');
   });
 });

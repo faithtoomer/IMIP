@@ -1,7 +1,7 @@
 import type { ValidationError } from './types.js';
 
 /**
- * §15 — configuration failures fail fast with structured diagnostics.
+ * §18 — configuration failures fail fast with structured diagnostics.
  * Messages must never interpolate raw sensitive values (see security.ts) —
  * only ids and validation messages are carried here.
  */
@@ -22,5 +22,23 @@ export class ConfigurationValidationError extends ConfigurationError {
     super('CONFIGURATION_VALIDATION_FAILED', message);
     this.name = 'ConfigurationValidationError';
     this.errors = errors;
+  }
+}
+
+/** Pipeline stage 1 (Syntax) failure — a source could not be parsed at all. */
+export class ConfigurationSyntaxError extends ConfigurationError {
+  readonly source: string;
+
+  constructor(message: string, source: string) {
+    super('CONFIGURATION_SYNTAX_ERROR', message);
+    this.name = 'ConfigurationSyntaxError';
+    this.source = source;
+  }
+}
+
+export class ConfigurationRollbackError extends ConfigurationError {
+  constructor(message: string) {
+    super('CONFIGURATION_ROLLBACK_FAILED', message);
+    this.name = 'ConfigurationRollbackError';
   }
 }

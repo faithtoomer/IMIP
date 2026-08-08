@@ -3,9 +3,9 @@ import { writeFileSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { ConfigurationAuthority } from '../src/ConfigurationAuthority.js';
-import { ConfigurationError, ConfigurationValidationError } from '../src/errors.js';
+import { ConfigurationError, ConfigurationValidationError, ConfigurationRollbackError } from '../src/errors.js';
 
-describe('failure handling (§15 — fail fast, no silent fallbacks)', () => {
+describe('failure handling (§18 — fail fast, no silent fallbacks)', () => {
   it('throws a structured ConfigurationValidationError on invalid startup config with no prior valid snapshot', () => {
     const filePath = join(tmpdir(), `imip-invalid-${Date.now()}.json`);
     writeFileSync(filePath, JSON.stringify({ 'platform.logLevel': 'not-a-real-level' }));
@@ -19,6 +19,18 @@ describe('failure handling (§15 — fail fast, no silent fallbacks)', () => {
         expect(error).toBeInstanceOf(ConfigurationValidationError);
         expect((error as ConfigurationValidationError).errors.length).toBeGreaterThan(0);
       }
+    } finally {
+      unlinkSync(filePath);
+    }
+  });
+
+  it('throws on a malformed (unparsable) config file with no prior valid snapshot', () => {
+    const filePath = join(tmpdir(), `imip-syntax-${Date.now()}.json`);
+    writeFileSync(filePath, '{ not valid json');
+
+    try {
+      const authority = new ConfigurationAuthority({ argv: [], env: {}, filePath });
+      expect(() => authority.load()).toThrow(ConfigurationValidationError);
     } finally {
       unlinkSync(filePath);
     }
@@ -60,5 +72,11 @@ describe('failure handling (§15 — fail fast, no silent fallbacks)', () => {
     const authority = new ConfigurationAuthority({ argv: [], env: {} });
     authority.load();
     expect(() => authority.requestUpdate('not.a.real.key', 1, 'test', 'Dashboard')).toThrow(/Unknown configuration key/);
+  });
+
+  it('rollback() to a nonexistent version throws ConfigurationRollbackError', () => {
+    const authority = new ConfigurationAuthority({ argv: [], env: {} });
+    authority.load();
+    expect(() => authority.rollback(999, 'test', 'Dashboard')).toThrow(ConfigurationRollbackError);
   });
 });

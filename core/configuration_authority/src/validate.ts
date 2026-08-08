@@ -1,5 +1,4 @@
 import type { ConfigEntry, ConfigValues, ValidationError, ValidationResult } from './types.js';
-import type { ConfigurationRegistry } from './registry.js';
 
 function typeOf(value: unknown): string {
   if (Array.isArray(value)) return 'array';
@@ -7,7 +6,12 @@ function typeOf(value: unknown): string {
   return typeof value;
 }
 
-/** Validates a fixed set of entries against a candidate value set. Unknown-key rejection is the caller's responsibility (see validateAll). */
+/**
+ * Type/range/enum/required/cross-field checks for a fixed set of entries.
+ * Reused by the validation pipeline (stages 3-5) and by plugin-scoped
+ * pre-validation (pluginConfig.ts). Unknown-key rejection (stage 2, schema)
+ * is the pipeline's responsibility, not this function's.
+ */
 export function validateEntries(entries: ConfigEntry[], values: ConfigValues): ValidationResult {
   const errors: ValidationError[] = [];
 
@@ -23,7 +27,6 @@ export function validateEntries(entries: ConfigEntry[], values: ConfigValues): V
     if (raw === undefined || raw === null) continue;
 
     const actualType = typeOf(raw);
-    const expectedType = entry.dataType === 'enum' ? typeof raw : entry.dataType;
 
     if (entry.dataType !== 'enum' && actualType !== entry.dataType) {
       errors.push({
@@ -33,15 +36,12 @@ export function validateEntries(entries: ConfigEntry[], values: ConfigValues): V
       continue;
     }
 
-    if (entry.dataType === 'enum') {
-      if (entry.enumValues && !entry.enumValues.includes(raw)) {
-        errors.push({
-          id: entry.id,
-          message: `"${entry.id}" must be one of [${entry.enumValues.join(', ')}], got "${String(raw)}".`,
-        });
-        continue;
-      }
-      void expectedType;
+    if (entry.dataType === 'enum' && entry.enumValues && !entry.enumValues.includes(raw)) {
+      errors.push({
+        id: entry.id,
+        message: `"${entry.id}" must be one of [${entry.enumValues.join(', ')}], got "${String(raw)}".`,
+      });
+      continue;
     }
 
     if (entry.dataType === 'number' && entry.range) {
@@ -61,21 +61,4 @@ export function validateEntries(entries: ConfigEntry[], values: ConfigValues): V
   }
 
   return { valid: errors.length === 0, errors };
-}
-
-/** Full-registry validation: validates every registered entry and rejects any unregistered key (SSOT enforcement). */
-export function validateAll(registry: ConfigurationRegistry, values: ConfigValues): ValidationResult {
-  const known = validateEntries(registry.all(), values);
-  const unknown: ValidationError[] = [];
-
-  for (const key of Object.keys(values)) {
-    if (!registry.get(key)) {
-      unknown.push({
-        id: key,
-        message: `Unknown configuration key "${key}" is not registered with the Configuration Authority.`,
-      });
-    }
-  }
-
-  return { valid: known.valid && unknown.length === 0, errors: [...known.errors, ...unknown] };
 }

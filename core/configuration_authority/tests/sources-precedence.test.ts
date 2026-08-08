@@ -4,8 +4,9 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { ConfigurationRegistry, DEFAULT_ENTRIES } from '../src/registry.js';
 import { resolveConfigValues, type SecretsProvider } from '../src/sources.js';
+import { ConfigurationSyntaxError } from '../src/errors.js';
 
-describe('source precedence (cli > env > file > secrets > default)', () => {
+describe('source precedence (cli > env > secrets > file > default)', () => {
   function freshRegistry() {
     const registry = new ConfigurationRegistry();
     registry.registerAll(DEFAULT_ENTRIES);
@@ -30,20 +31,32 @@ describe('source precedence (cli > env > file > secrets > default)', () => {
     }
   });
 
-  it('an env var overrides the config file', () => {
+  it('the secrets store overrides the config file (new precedence order)', () => {
     const registry = freshRegistry();
-    const filePath = join(tmpdir(), `imip-config-${Date.now()}-2.json`);
-    writeFileSync(filePath, JSON.stringify({ 'platform.locale': 'fr-FR' }));
+    const filePath = join(tmpdir(), `imip-config-${Date.now()}-secrets.json`);
+    writeFileSync(filePath, JSON.stringify({ 'wallet.addresses': [{ coin: 'XMR', address: 'from-file' }] }));
+    const provider: SecretsProvider = {
+      get: (id) => (id === 'wallet.addresses' ? [{ coin: 'XMR', address: 'from-secrets' }] : undefined),
+    };
     try {
-      const { values } = resolveConfigValues(registry, {
-        argv: [],
-        env: { IMIP_PLATFORM_LOCALE: 'de-DE' },
-        filePath,
-      });
-      expect(values['platform.locale']).toBe('de-DE');
+      const { values } = resolveConfigValues(registry, { argv: [], env: {}, filePath, secretsProvider: provider });
+      expect(values['wallet.addresses']).toEqual([{ coin: 'XMR', address: 'from-secrets' }]);
     } finally {
       unlinkSync(filePath);
     }
+  });
+
+  it('an env var overrides the secrets store', () => {
+    const registry = freshRegistry();
+    const provider: SecretsProvider = {
+      get: (id) => (id === 'wallet.addresses' ? [{ coin: 'XMR', address: 'from-secrets' }] : undefined),
+    };
+    const { values } = resolveConfigValues(registry, {
+      argv: [],
+      env: { IMIP_WALLET_ADDRESSES: '[]' },
+      secretsProvider: provider,
+    });
+    expect(values['wallet.addresses']).toEqual([]);
   });
 
   it('a CLI argument overrides everything else', () => {
@@ -55,13 +68,13 @@ describe('source precedence (cli > env > file > secrets > default)', () => {
     expect(values['platform.locale']).toBe('es-ES');
   });
 
-  it('the secrets store only fills sensitive keys, ranked below file, above default', () => {
+  it('the secrets store only fills non-public/internal keys', () => {
     const registry = freshRegistry();
     const provider: SecretsProvider = {
-      get: (id) => (id === 'wallet.addresses' ? [{ coin: 'XMR', address: 'secret-address' }] : undefined),
+      get: (id) => (id === 'platform.locale' ? 'should-not-apply' : undefined),
     };
     const { values } = resolveConfigValues(registry, { argv: [], env: {}, secretsProvider: provider });
-    expect(values['wallet.addresses']).toEqual([{ coin: 'XMR', address: 'secret-address' }]);
+    expect(values['platform.locale']).toBe('en-US');
   });
 
   it('resolution records the winning source per key', () => {
@@ -72,5 +85,16 @@ describe('source precedence (cli > env > file > secrets > default)', () => {
     });
     const localeResolution = resolution.find((r) => r.id === 'platform.locale');
     expect(localeResolution?.source).toBe('cli');
+  });
+
+  it('a malformed config file raises a ConfigurationSyntaxError (stage 1)', () => {
+    const registry = freshRegistry();
+    const filePath = join(tmpdir(), `imip-bad-${Date.now()}.json`);
+    writeFileSync(filePath, '{ not valid json');
+    try {
+      expect(() => resolveConfigValues(registry, { argv: [], env: {}, filePath })).toThrow(ConfigurationSyntaxError);
+    } finally {
+      unlinkSync(filePath);
+    }
   });
 });

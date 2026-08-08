@@ -2,9 +2,10 @@ import { appendFileSync } from 'node:fs';
 import type { AuditRecord } from './types.js';
 
 /**
- * §12 — every configuration change generates an audit record. Records are
- * append-only and immutable once written. Callers must pass already-masked
- * previousValue/newValue for sensitive keys (see security.ts).
+ * Change-level audit log (distinct from per-key ProvenanceRecord in provenance.ts):
+ * every configuration change generates an audit record. Records are append-only
+ * and immutable once written. Callers must pass already-masked previousValue/
+ * newValue for confidential/restricted/secret keys (see security.ts).
  *
  * Persistence: in-memory by default, plus an optional append-only JSONL file.
  * The Database Authority (reserved, not yet implemented) will own durable
