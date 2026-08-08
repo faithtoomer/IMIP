@@ -73,3 +73,27 @@ Runtime architecture (topology, layers, lifecycle, dependency laws, decision pip
 ## Phase 09
 
 `core/storage_authority/` is the sixth implemented core module and Program II's second — the Institutional Storage Management Authority (ISMA), owning physical storage infrastructure as distinct from IDA's ownership of logical data. IDA and `configuration_authority/` were additively retrofitted with an opt-in `storageAuthority` option. See `storage_authority/README.md` and `architecture/adr/ADR-0012-institutional-storage-management-authority.md`.
+
+## Phase 10
+
+`core/observability_authority/` is the seventh implemented core module and Program II's third — the Institutional Observability & Logging Authority (IOLA): structured, schema-enforced logging, correlation/tracing, immutable audit logging, diagnostics, and the Institutional Observability Graph. See `observability_authority/README.md` and `architecture/adr/ADR-0013-institutional-observability-logging-authority.md`.
+
+## Phase 11
+
+`core/scheduling_authority/` is the eighth implemented core module and Program II's fourth — the Institutional Scheduling & Orchestration Authority (ISOA): time/dependency/policy/resource-aware scheduling, retry management, maintenance windows, and the Institutional Time Graph. A pre-coding spec review found Policy Authority and Workload Authority both still reserved; ISOA's evaluators are real, permissive-by-default extension points rather than fabricated logic. See `scheduling_authority/README.md` and `architecture/adr/ADR-0014-institutional-scheduling-orchestration-authority.md`.
+
+## Phase 12
+
+`core/security_authority/` is the ninth implemented core module and Program II's fifth — the Institutional Security & Trust Authority (ISTA): security governance, Zero Implicit Trust, deny-by-default authorization, a real-encryption Secret Vault, immutable security auditing, and the Institutional Security Posture Model. See `security_authority/README.md` and `architecture/adr/ADR-0015-institutional-security-trust-authority.md`.
+
+## Phase 13
+
+`core/notification_authority/` is the tenth implemented core module and Program II's sixth — the Institutional Notification & Communication Authority (INCA): notifications as decisions, real multi-channel delivery, escalation, suppression, acknowledgement tracking, digest generation genuinely integrated with ISOA, and the Institutional Communication Intelligence layer. See `notification_authority/README.md` and `architecture/adr/ADR-0016-institutional-notification-communication-authority.md`.
+
+## Phase 14
+
+`core/resilience_authority/` is the eleventh implemented core module and Program II's seventh — the Institutional Backup, Recovery & Resilience Authority (IBRRA): real cross-authority backup/recovery orchestration over IDA/ICMS/ISMA/IHIS/IRBLM's own existing mechanisms, mandatory verification, deterministic recovery, and the Institutional Recovery Graph. See `resilience_authority/README.md` and `architecture/adr/ADR-0017-institutional-backup-recovery-resilience-authority.md`.
+
+## Phase 15
+
+`core/version_governance_authority/` is the twelfth implemented core module and Program II's eighth and final — the Institutional Version Governance & Migration Authority (IVGMA): real cross-authority version governance and migration orchestration over ICMS/IDA/IEB/IBRRA's own existing mechanisms, fail-closed compatibility verification, transactional migration, and the Institutional Evolution Graph. See `version_governance_authority/README.md` and `architecture/adr/ADR-0018-institutional-version-governance-migration-authority.md`. **Program II — Core Infrastructure is certified complete as of this phase.**

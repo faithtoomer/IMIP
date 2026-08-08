@@ -17,7 +17,9 @@ export type EventCategory =
   | 'ai'
   | 'dashboard'
   | 'notification'
-  | 'diagnostics';
+  | 'diagnostics'
+  | 'resilience'
+  | 'version-governance';
 
 /** §13 — priority affects delivery order, never ownership. */
 export type EventPriority = 'critical' | 'high' | 'normal' | 'low' | 'background';

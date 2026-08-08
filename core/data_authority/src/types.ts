@@ -1,4 +1,6 @@
-/** §6 — the 18 institutional data domains. */
+/** §6 — the 18 institutional data domains, plus additive Program II
+ * extensions (documented at each addition site — see ADR-0013 for
+ * 'runtime-logs', added for IOLA's optional database log sink). */
 export type DataDomain =
   | 'configuration'
   | 'capability-registry'
@@ -17,7 +19,8 @@ export type DataDomain =
   | 'notifications'
   | 'ai-models'
   | 'explainability-records'
-  | 'audit-logs';
+  | 'audit-logs'
+  | 'runtime-logs';
 
 export type FieldType = 'string' | 'number' | 'boolean' | 'json' | 'timestamp';
 
