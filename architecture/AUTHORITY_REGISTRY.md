@@ -23,7 +23,7 @@ Full authority contracts (Responsibilities, Owned State, Dependencies, Published
 | Power Authority (IPIA) | Institutional Authority | Owns power monitoring, energy cost/efficiency analysis, power budgeting, advisory power recommendations, and the Institutional Energy Digital Twin (IEDT). Implemented as IPIA (`core/power_authority/`, PHASE-16). |
 | Thermal Authority (ITIA) | Institutional Authority | Owns thermal telemetry, trend/forecast/anomaly analysis, thermal budgeting, advisory thermal recommendations, and the Institutional Thermal Digital Twin (ITDT). Implemented as ITIA (`core/thermal_authority/`, PHASE-17). |
 | Resource Authority (IRIA) | Institutional Authority | Owns resource registry, availability, allocation, reservation, ownership/leasing, utilization, capacity forecasting, and the Institutional Resource Digital Twin (IRDT). Implemented as IRIA (`core/resource_authority/`, PHASE-18). |
-| Health Authority | Institutional Authority | Owns platform and plugin health monitoring. |
+| Health Authority (IHIA) | Institutional Authority | Owns institutional cross-cutting health registry, configurable scoring, reliability/trend analysis, advisory failure forecasting, explainability, and the Institutional Health Digital Twin (IHDT). Implemented as IHIA (`core/health_authority/`, PHASE-20). |
 | Scheduler Authority | Institutional Authority | Owns mining schedules and workload timing. |
 | Telemetry Authority | Institutional Authority | Owns telemetry collection and distribution. |
 | Database Authority | Institutional Authority | Owns data persistence and the permanent audit trail. |

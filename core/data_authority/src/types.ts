@@ -2,7 +2,8 @@
  * extensions (documented at each addition site — see ADR-0013 for
  * 'runtime-logs', added for IOLA's optional database log sink, and
  * ADR-0009 for 'power-history', added for IPIA, and ADR-0019 for
- * workload-registry/workload-history, added for IWIA — deliberately distinct
+ * workload-registry/workload-history, added for IWIA; and ADR-0020 for
+ * health-registry/health-history, added for IHIA — deliberately distinct
  * from the existing, ambiguous 'telemetry' value, which no authority has
  * ever actually claimed). */
 export type DataDomain =
@@ -18,6 +19,8 @@ export type DataDomain =
   | 'benchmark-results'
   | 'workload-registry'
   | 'workload-history'
+  | 'health-registry'
+  | 'health-history'
   | 'mining-sessions'
   | 'wallet-metadata'
   | 'pool-metadata'
