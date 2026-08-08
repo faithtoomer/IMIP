@@ -17,6 +17,8 @@ export type DataDomain =
   | 'decision-history'
   | 'profitability-history'
   | 'benchmark-results'
+  | 'arbitration-registry'
+  | 'arbitration-history'
   | 'workload-registry'
   | 'workload-history'
   | 'health-registry'
