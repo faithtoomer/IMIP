@@ -7,6 +7,7 @@ export type EventCategory =
   | 'mining'
   | 'scheduler'
   | 'workload'
+  | 'benchmark'
   | 'power'
   | 'thermal'
   | 'health'

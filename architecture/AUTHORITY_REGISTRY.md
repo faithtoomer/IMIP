@@ -15,6 +15,7 @@ Full authority contracts (Responsibilities, Owned State, Dependencies, Published
 |-----------|-------|---------|
 | Configuration Authority | Institutional Authority | Owns institutional configuration state and schema for platform and plugins. |
 | Hardware Authority | Institutional Authority | Owns hardware discovery, inventory, and capability reporting. |
+| Benchmark Authority | Institutional Authority | Owns institutional benchmark catalog, lifecycle orchestration, comparison, explainability, and the Institutional Performance Knowledge Base (IPKB), while delegating certified raw per-device result persistence to IHIS. Implemented as IBIA (`core/benchmark_authority/`, PHASE-21). |
 | Capability Registry Authority | Capability | Owns the Platform Capability Registry (PCR); authoritative inventory of platform capabilities. |
 | Plugin Registry Authority | Capability | Owns plugin discovery, manifest validation, and plugin registration. |
 | Mining Authority | Institutional Authority | Owns authorization and control of mining operations via the Mining Adapter Layer. |
