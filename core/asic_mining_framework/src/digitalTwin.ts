@@ -1,0 +1,7 @@
+import type { AsicMiningDigitalTwinRecord, AsicPerformanceRecord, AsicProfile } from './types.js';
+/** Append-only evidence chain (ASIC → algorithm → firmware → hashrate → power → thermal → health → efficiency → reliability). */
+export class AsicFleetDigitalTwin {
+  private readonly records: AsicMiningDigitalTwinRecord[] = [];
+  record(input: { sessionId: string; profile: AsicProfile; algorithm: string; performance: AsicPerformanceRecord }): AsicMiningDigitalTwinRecord { const record: AsicMiningDigitalTwinRecord = Object.freeze({ sessionId: input.sessionId, recordedAt: input.performance.recordedAt, asicUuid: input.profile.asicUuid, manufacturer: input.profile.manufacturer, model: input.profile.model, algorithm: input.algorithm, firmware: input.profile.firmware, hashrateHps: input.performance.hashrateHps, powerWatts: input.performance.powerWatts, thermalState: input.profile.thermalState.state, health: input.profile.deviceHealth.status, efficiencyHpsPerWatt: input.performance.efficiencyHpsPerWatt, reliability: input.profile.deviceHealth.reliability }); this.records.push(record); return record; }
+  query(filter: Partial<Pick<AsicMiningDigitalTwinRecord, 'sessionId' | 'asicUuid' | 'algorithm'>> = {}): AsicMiningDigitalTwinRecord[] { return this.records.filter((record) => (!filter.sessionId || record.sessionId === filter.sessionId) && (!filter.asicUuid || record.asicUuid === filter.asicUuid) && (!filter.algorithm || record.algorithm === filter.algorithm)); }
+}

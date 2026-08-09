@@ -8,6 +8,7 @@ export type EventCategory =
   | 'mining-adapter'
   | 'cpu-mining'
   | 'gpu-mining'
+  | 'asic-mining'
   | 'scheduler'
   | 'workload'
   | 'benchmark'

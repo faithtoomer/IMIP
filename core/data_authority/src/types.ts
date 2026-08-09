@@ -31,6 +31,8 @@ export type DataDomain =
   | 'cpu-mining-digital-twin'
   | 'gpu-mining-performance'
   | 'gpu-mining-digital-twin'
+  | 'asic-mining-performance'
+  | 'asic-mining-digital-twin'
   | 'mining-sessions'
   | 'wallet-metadata'
   | 'pool-metadata'
