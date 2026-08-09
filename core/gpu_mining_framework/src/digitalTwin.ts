@@ -1,0 +1,7 @@
+import type { GpuMiningDigitalTwinRecord, GpuPerformanceRecord, GpuProfile } from './types.js';
+/** Append-only descriptive evidence for future intelligence; it cannot change a GPU session or authority policy. */
+export class GpuMiningDigitalTwin {
+  private readonly records: GpuMiningDigitalTwinRecord[] = [];
+  record(input: { sessionId: string; profile: GpuProfile; algorithm: string; configuration: { intensity: number; requiredVramMB: number }; performance: GpuPerformanceRecord }): GpuMiningDigitalTwinRecord { const record: GpuMiningDigitalTwinRecord = Object.freeze({ sessionId: input.sessionId, recordedAt: input.performance.recordedAt, gpuUuid: input.profile.gpuUuid, architecture: input.profile.architecture, algorithm: input.algorithm, configuration: { ...input.configuration }, hashrateHps: input.performance.hashrateHps, powerWatts: input.performance.powerConsumptionWatts, temperatureCelsius: input.performance.temperatureCelsius, efficiencyHpsPerWatt: input.performance.hashratePerWatt, reliability: input.profile.health }); this.records.push(record); return record; }
+  query(filter: Partial<Pick<GpuMiningDigitalTwinRecord, 'sessionId' | 'gpuUuid' | 'algorithm'>> = {}): GpuMiningDigitalTwinRecord[] { return this.records.filter((record) => (!filter.sessionId || record.sessionId === filter.sessionId) && (!filter.gpuUuid || record.gpuUuid === filter.gpuUuid) && (!filter.algorithm || record.algorithm === filter.algorithm)); }
+}

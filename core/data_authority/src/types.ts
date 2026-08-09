@@ -29,6 +29,8 @@ export type DataDomain =
   | 'mining-adapter-history'
   | 'cpu-mining-performance'
   | 'cpu-mining-digital-twin'
+  | 'gpu-mining-performance'
+  | 'gpu-mining-digital-twin'
   | 'mining-sessions'
   | 'wallet-metadata'
   | 'pool-metadata'
