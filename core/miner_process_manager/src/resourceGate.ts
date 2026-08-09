@@ -1,0 +1,6 @@
+import type { ResourceAvailabilityProvider, ResourcePermissionProvider, ResourceReservationProvider } from './providers.js';
+import type { ProcessLaunchRequest } from './types.js';
+export class ResourceGate {
+ constructor(private readonly availability: ResourceAvailabilityProvider, private readonly reservation: ResourceReservationProvider, private readonly permission: ResourcePermissionProvider) {}
+ async pass(request: ProcessLaunchRequest, processUuid: string): Promise<string[]> { const context = { processUuid, workloadUuid: request.parentWorkloadUuid }; const available = await this.availability.checkAvailability(request.resourceRequirements, context); if (!available.available) throw new Error(available.reason ?? 'Resource availability rejected launch.'); const reserved = await this.reservation.reserve(request.resourceRequirements, context); if (!reserved.reserved) throw new Error(reserved.reason ?? 'Resource reservation rejected launch.'); const permitted = await this.permission.authorizeProcess({ ...context, reservationIds: reserved.reservationIds }); if (!permitted.allowed) { await this.reservation.release?.(reserved.reservationIds, 'process permission denied'); throw new Error(permitted.reason ?? 'Process permission rejected launch.'); } return reserved.reservationIds; }
+}

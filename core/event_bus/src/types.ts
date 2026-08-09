@@ -6,6 +6,7 @@ export type EventCategory =
   | 'runtime'
   | 'mining'
   | 'mining-adapter'
+  | 'miner-process'
   | 'cpu-mining'
   | 'gpu-mining'
   | 'asic-mining'

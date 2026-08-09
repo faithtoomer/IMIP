@@ -27,6 +27,7 @@ export type DataDomain =
   | 'health-history'
   | 'mining-adapter-registry'
   | 'mining-adapter-history'
+  | 'miner-process-supervision'
   | 'cpu-mining-performance'
   | 'cpu-mining-digital-twin'
   | 'gpu-mining-performance'

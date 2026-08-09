@@ -1,0 +1,5 @@
+import { EventEmitter } from 'node:events';
+import type { ProcessEventPayload } from './types.js';
+export const MINER_PROCESS_EVENTS = { MinerProcessRequested: 'MinerProcessRequested', MinerProcessCreated: 'MinerProcessCreated', MinerProcessStarted: 'MinerProcessStarted', MinerProcessReady: 'MinerProcessReady', MinerProcessDegraded: 'MinerProcessDegraded', MinerProcessStopped: 'MinerProcessStopped', MinerProcessFailed: 'MinerProcessFailed', MinerProcessRestarted: 'MinerProcessRestarted', MinerProcessTerminated: 'MinerProcessTerminated' } as const;
+export type MinerProcessEventName = (typeof MINER_PROCESS_EVENTS)[keyof typeof MINER_PROCESS_EVENTS];
+export class MinerProcessEventBus { private readonly emitter = new EventEmitter(); publish(event: MinerProcessEventName, payload: ProcessEventPayload): void { this.emitter.emit(event, payload); } subscribe(event: MinerProcessEventName, handler: (payload: ProcessEventPayload) => void): () => void { this.emitter.on(event, handler); return () => this.emitter.off(event, handler); } }
