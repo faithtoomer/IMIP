@@ -25,6 +25,8 @@ export type DataDomain =
   | 'workload-history'
   | 'health-registry'
   | 'health-history'
+  | 'mining-adapter-registry'
+  | 'mining-adapter-history'
   | 'mining-sessions'
   | 'wallet-metadata'
   | 'pool-metadata'

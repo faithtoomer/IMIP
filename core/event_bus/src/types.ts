@@ -5,6 +5,7 @@ export type EventCategory =
   | 'hardware'
   | 'runtime'
   | 'mining'
+  | 'mining-adapter'
   | 'scheduler'
   | 'workload'
   | 'benchmark'
