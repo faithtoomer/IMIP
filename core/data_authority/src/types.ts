@@ -28,6 +28,8 @@ export type DataDomain =
   | 'mining-adapter-registry'
   | 'mining-adapter-history'
   | 'miner-process-supervision'
+  | 'mining-statistics'
+  | 'mining-statistics-rollup'
   | 'cpu-mining-performance'
   | 'cpu-mining-digital-twin'
   | 'gpu-mining-performance'
