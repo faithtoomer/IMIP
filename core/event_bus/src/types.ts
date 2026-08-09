@@ -9,6 +9,7 @@ export type EventCategory =
   | 'miner-process'
   | 'mining-statistics'
   | 'mining-plugin-runtime'
+  | 'mining-plugin-certification'
   | 'cpu-mining'
   | 'gpu-mining'
   | 'asic-mining'

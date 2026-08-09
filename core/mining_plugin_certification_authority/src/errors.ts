@@ -1,0 +1,5 @@
+export class PluginCertificationError extends Error { constructor(message: string) { super(message); this.name = 'PluginCertificationError'; } }
+export class PluginCertificationNotFoundError extends PluginCertificationError { constructor(certificationId: string) { super(`No IMPCA certification record exists for ${certificationId}.`); this.name = 'PluginCertificationNotFoundError'; } }
+export class PluginCertificationLifecycleError extends PluginCertificationError { constructor(from: string | undefined, to: string) { super(`IMPCA lifecycle transition ${from ?? 'none'} -> ${to} is not allowed.`); this.name = 'PluginCertificationLifecycleError'; } }
+export class PluginSelfCertificationError extends PluginCertificationError { constructor() { super('Plugin manifest self-declared certification claims are not accepted by IMPCA.'); this.name = 'PluginSelfCertificationError'; } }
+export class PluginCertificationEvidenceError extends PluginCertificationError { constructor() { super('Certification requires a non-empty IMPCA evidence trail.'); this.name = 'PluginCertificationEvidenceError'; } }
