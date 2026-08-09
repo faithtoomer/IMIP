@@ -1,0 +1,27 @@
+import type { MiningAdapter } from '../../mining_adapter_framework/src/adapterContract.js';
+import type { AdapterCapabilities, AdapterDiagnostics, AdapterHealth, AdapterManifest, AdapterPreparationContext, AdapterValidationRequest, AdapterValidationResult, BackendConfig, NormalizedStatistics } from '../../mining_adapter_framework/src/types.js';
+import { CpuMiningFramework } from '../src/CpuMiningFramework.js';
+import { TEST_ALGORITHM_PROFILE } from '../src/algorithmAbstraction.js';
+import type { CpuMiningConfig } from '../src/types.js';
+import type { CpuMiningProviders } from '../src/providers.js';
+
+export class FakeCpuAdapter implements MiningAdapter {
+  started = 0; stopped = 0; statisticsValue: unknown = { hashrateHps: 400, acceptedShares: 10, rejectedShares: 1, errorRate: 0.01, uptimeSeconds: 120, workerStatus: 'running', temperatureCelsius: 65, powerWatts: 80, extensions: { fixture: true } }; healthValue: AdapterHealth = { status: 'healthy', reasons: [] }; failStart = false;
+  async identify(): Promise<AdapterManifest> { return { adapterId: 'fake-cpu-adapter', name: 'Fake CPU Adapter', version: '1', vendor: 'test', backend: 'fixture', supportedOperatingSystems: ['test'], supportedHardware: ['cpu'], supportedAlgorithms: [TEST_ALGORITHM_PROFILE.algorithmId], supportedProtocols: ['test-pool'], requiredCapabilities: [], supportedFeatures: [], configurationSchema: {}, minimumFrameworkVersion: '1', certificationStatus: 'development' }; }
+  async validate(_request: AdapterValidationRequest): Promise<AdapterValidationResult> { return { valid: true, reasons: [] }; } async configure(_config: BackendConfig): Promise<void> {} async prepare(_context: AdapterPreparationContext): Promise<void> {}
+  async start(): Promise<void> { this.started++; if (this.failStart) throw new Error('fixture start failure'); } async pause(): Promise<void> {} async resume(): Promise<void> {} async stop(): Promise<void> { this.stopped++; } async restart(): Promise<void> {}
+  async health(): Promise<AdapterHealth> { return this.healthValue; } async statistics(): Promise<unknown> { return this.statisticsValue; } async capabilities(): Promise<AdapterCapabilities> { return { operatingSystems: ['test'], hardware: ['cpu'], algorithms: [TEST_ALGORITHM_PROFILE.algorithmId], protocols: ['test-pool'], statistics: ['hashrateHps'], controlOperations: ['start', 'stop'], features: [] }; } async diagnostics(): Promise<AdapterDiagnostics> { return { details: {} }; } async cleanup(): Promise<void> {}
+}
+
+export class FakeProviders implements CpuMiningProviders {
+  calls = { reserve: 0, release: 0, mutation: 0 };
+  hardware = { getCpu: (_id: string) => ({ cpuUuid: 'cpu-1', coreCount: 4, threadCount: 8, architecture: 'x86_64', instructionSets: ['fixture-simd', 'sse2'], cache: { l1KB: 128, l2KB: 1024, l3KB: 8192 }, numaTopology: [{ nodeId: 0, threadIds: [0, 1, 2, 3] }, { nodeId: 1, threadIds: [4, 5, 6, 7] }], currentUtilizationPercent: 55, availableMemoryMB: 4096, health: 'healthy' as const, healthReasons: [] }) };
+  resource = { reserveThreads: (request: { cpuUuid: string; requestedThreads: number }) => { this.calls.reserve++; return { reservationId: 'reservation-1', cpuUuid: request.cpuUuid, grantedThreadIds: [0, 1, 4, 5].slice(0, request.requestedThreads), grantedCoreIds: [0, 1, 2, 3].slice(0, request.requestedThreads), numaNodeByThread: { 0: 0, 1: 0, 4: 1, 5: 1 } }; }, releaseThreads: (_id: string, _reason: string) => { this.calls.release++; }, getAllocation: (_id: string) => ({ availableThreads: 4, allocatedThreads: 4, currentUtilizationPercent: 55, contentionReasons: [] as string[] }) };
+  thermal = { getThermalState: (_id: string) => ({ currentCelsius: 65, state: 'nominal' as const, warningThresholdCelsius: 80, criticalThresholdCelsius: 90, sensorAvailable: true }) };
+  power = { getPowerState: (_id: string) => ({ currentWatts: 80, state: 'healthy' as const, maximumRatedWatts: 150, budgetLimitWatts: 120, budgetExceeded: false, sensorAvailable: true }) };
+  certification = { getCertificationStatus: (_id: string) => ({ status: 'certified' as const, certificationId: 'cert-1' }) };
+}
+export function config(adapter: MiningAdapter, overrides: Partial<CpuMiningConfig> = {}): CpuMiningConfig { return { algorithm: TEST_ALGORITHM_PROFILE, threadAllocation: { cpuUuid: 'cpu-1', requestedThreads: 4, owner: 'coin-plugin', requestingAuthority: 'CPU Mining Framework' }, affinityPreference: { strategy: 'numa-local', preferredNumaNodes: [0] }, backendAdapter: adapter, pool: { endpoint: 'test://pool', protocol: 'test-pool' }, walletReference: 'opaque-wallet-reference', workerIdentity: 'worker-1', performanceMode: 'balanced', resourceLimits: { maximumTemperatureCelsius: 90, maximumPowerWatts: 120 }, ...overrides }; }
+export function makeFramework(adapter = new FakeCpuAdapter(), providers = new FakeProviders()) { const framework = new CpuMiningFramework({ providers, adapter, now: () => '2026-08-09T12:00:00.000Z' }); framework.registerAlgorithm(TEST_ALGORITHM_PROFILE); return { framework, adapter, providers }; }
+export async function running() { const result = makeFramework(); const session = await result.framework.start(config(result.adapter)); return { ...result, session }; }
+export function normalized(overrides: Partial<NormalizedStatistics> = {}): NormalizedStatistics { return { hashrateHps: 400, acceptedShares: 10, rejectedShares: 1, errorRate: .01, uptimeSeconds: 120, workerStatus: 'running', temperatureCelsius: 65, powerWatts: 80, extensions: {}, ...overrides }; }

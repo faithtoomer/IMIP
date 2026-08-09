@@ -1,0 +1,3 @@
+import { describe, expect, it } from 'vitest';
+import { running } from './testHelpers.js';
+describe('ICMF explainability', () => { it('explains lifecycle, generic algorithm compatibility, and safety detection', async () => { const { framework, session } = await running(); const monitored = await framework.monitor(session.sessionId, { category: 'PoolFailure', message: 'pool', retriable: true }); expect(framework.explainLifecycle(session.sessionId).stage).toBe('monitored'); expect(framework.explainCompatibility(session.sessionId)).toMatchObject({ compatible: true, rejected: [] }); expect(framework.explainSafety(session.sessionId, monitored.safety)).toMatchObject({ degraded: true }); }); });

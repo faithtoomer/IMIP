@@ -21,6 +21,7 @@ Full authority contracts (Responsibilities, Owned State, Dependencies, Published
 | Plugin Registry Authority | Capability | Owns plugin discovery, manifest validation, and plugin registration. |
 | Mining Authority | Institutional Authority | Owns authorization and control of mining operations via the Mining Adapter Layer. |
 | Mining Adapter Framework | Institutional Framework | Provides the backend-neutral adapter contract, capability negotiation, normalized mining-backend intelligence, and guarded adapter lifecycle. Implemented as IMAF (`core/mining_adapter_framework/`, PHASE-24). |
+| CPU Mining Framework | Institutional Framework | Provides coin-agnostic CPU mining-session composition, IRIA-granted thread placement, normalized performance intelligence, advisory optimization, safety reporting, and CPU Performance Digital Twin records. Implemented as ICMF (`core/cpu_mining_framework/`, PHASE-25). |
 | Decision Intelligence Authority | Decision | Owns the Decision Engine, decision graph, and policy evaluation orchestration. |
 | Profitability Authority | Institutional Authority | Owns profitability calculation and evaluation. |
 | Power Authority (IPIA) | Institutional Authority | Owns power monitoring, energy cost/efficiency analysis, power budgeting, advisory power recommendations, and the Institutional Energy Digital Twin (IEDT). Implemented as IPIA (`core/power_authority/`, PHASE-16). |

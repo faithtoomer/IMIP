@@ -1,0 +1,3 @@
+import { describe, expect, it } from 'vitest';
+import { running } from './testHelpers.js';
+describe('ICMF CPU Performance Digital Twin', () => { it('records and queries the CPU-to-efficiency training-data chain', async () => { const { framework, session } = await running(); await framework.monitor(session.sessionId); const records = framework.digitalTwin.query({ sessionId: session.sessionId }); expect(records).toHaveLength(1); expect(records[0]).toMatchObject({ cpuUuid: 'cpu-1', algorithmId: 'test-algo-fixture', hashrateHps: 400, powerWatts: 80, temperatureCelsius: 65, efficiencyHpsPerWatt: 5 }); }); });

@@ -1,0 +1,5 @@
+import { describe, expect, it } from 'vitest';
+import { CpuAlgorithmRegistry, TEST_ALGORITHM_PROFILE } from '../src/algorithmAbstraction.js';
+import { composeCpuProfile } from '../src/cpuProfile.js';
+import { FakeProviders } from './testHelpers.js';
+describe('ICMF generic algorithm abstraction', () => { it('accepts compatible generic profiles, rejects incompatible requirements, and is deterministic', () => { const registry = new CpuAlgorithmRegistry(); registry.register(TEST_ALGORITHM_PROFILE); const compatible = registry.compatibility(composeCpuProfile(new FakeProviders(), 'cpu-1'), TEST_ALGORITHM_PROFILE, 4); const incompatible = registry.compatibility({ ...composeCpuProfile(new FakeProviders(), 'cpu-1'), instructionSets: [] }, TEST_ALGORITHM_PROFILE, 4); expect(compatible.compatible).toBe(true); expect(incompatible.compatible).toBe(false); expect(incompatible.reasons).toEqual(registry.compatibility({ ...composeCpuProfile(new FakeProviders(), 'cpu-1'), instructionSets: [] }, TEST_ALGORITHM_PROFILE, 4).reasons); expect(TEST_ALGORITHM_PROFILE.algorithmId).not.toMatch(/randomx|monero/i); }); });

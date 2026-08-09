@@ -1,0 +1,3 @@
+import { describe, expect, it } from 'vitest';
+import { config, makeFramework } from './testHelpers.js';
+describe('ICMF secret-reference boundary', () => { it('accepts opaque wallet/password references and rejects raw credential-shaped fields', async () => { const { framework, adapter, providers } = makeFramework(); const unsafe = config(adapter) as unknown as { pool: Record<string, unknown> }; unsafe.pool.password = 'raw-pool-password'; await expect(framework.start(unsafe as never)).rejects.toThrow('opaque references only'); expect(adapter.started).toBe(0); expect(providers.calls.reserve).toBe(0); }); });

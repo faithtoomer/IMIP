@@ -1,0 +1,4 @@
+import { describe, expect, it } from 'vitest';
+import { composeCpuProfile } from '../src/cpuProfile.js';
+import { FakeProviders } from './testHelpers.js';
+describe('ICMF CPU Profile composed view', () => { it('composes every CPU profile dimension from source-shaped fake providers with no independent cache', () => { const providers = new FakeProviders(); const first = composeCpuProfile(providers, 'cpu-1'); expect(composeCpuProfile(providers, 'cpu-1')).toEqual(first); providers.thermal.getThermalState = () => ({ currentCelsius: 79, state: 'warning', sensorAvailable: true }); const second = composeCpuProfile(providers, 'cpu-1'); expect(first).toMatchObject({ cpuUuid: 'cpu-1', coreCount: 4, threadCount: 8, availableThreads: 4, allocatedThreads: 4, certificationStatus: { status: 'certified' } }); expect(second.thermalState.currentCelsius).toBe(79); expect(first.thermalState.currentCelsius).toBe(65); }); });
