@@ -1,0 +1,12 @@
+import type { PluginExecutionTraceInput } from './types.js';
+export interface InstitutionalPluginExecutionTrace extends PluginExecutionTraceInput { pluginInstanceUuid: string; pluginUuid: string; }
+export interface PluginExecutionGraphNode { kind: 'plugin' | 'dependency' | 'capability' | 'resource' | 'workload' | 'miner-process' | 'statistics'; identifier: string; }
+/** Queryable traceability chain: Plugin -> Dependencies -> Capabilities -> Resources -> Workloads -> Miner Processes -> Statistics. */
+export class InstitutionalPluginExecutionGraph {
+ private readonly traces = new Map<string, InstitutionalPluginExecutionTrace>();
+ record(trace: InstitutionalPluginExecutionTrace): void { this.traces.set(trace.pluginInstanceUuid, Object.freeze({ ...trace, dependencies:[...trace.dependencies], capabilities:[...trace.capabilities], resourceIds:[...trace.resourceIds], workloadUuids:[...trace.workloadUuids], minerProcessUuids:[...trace.minerProcessUuids], statisticIds:[...trace.statisticIds] })); }
+ update(pluginInstanceUuid: string, updates: Partial<PluginExecutionTraceInput>): void { const current=this.traces.get(pluginInstanceUuid); if (!current) return; this.record({ ...current, dependencies:updates.dependencies ?? current.dependencies, capabilities:updates.capabilities ?? current.capabilities, resourceIds:updates.resourceIds ?? current.resourceIds, workloadUuids:updates.workloadUuids ?? current.workloadUuids, minerProcessUuids:updates.minerProcessUuids ?? current.minerProcessUuids, statisticIds:updates.statisticIds ?? current.statisticIds }); }
+ tracePlugin(pluginInstanceUuid: string): InstitutionalPluginExecutionTrace | undefined { return this.traces.get(pluginInstanceUuid); }
+ traceResource(resourceId: string): InstitutionalPluginExecutionTrace[] { return [...this.traces.values()].filter((trace) => trace.resourceIds.includes(resourceId)); }
+ chain(pluginInstanceUuid: string): PluginExecutionGraphNode[] { const trace=this.traces.get(pluginInstanceUuid); if (!trace) return []; return [{kind:'plugin',identifier:trace.pluginUuid},...trace.dependencies.map(identifier=>({kind:'dependency' as const,identifier})),...trace.capabilities.map(identifier=>({kind:'capability' as const,identifier})),...trace.resourceIds.map(identifier=>({kind:'resource' as const,identifier})),...trace.workloadUuids.map(identifier=>({kind:'workload' as const,identifier})),...trace.minerProcessUuids.map(identifier=>({kind:'miner-process' as const,identifier})),...trace.statisticIds.map(identifier=>({kind:'statistics' as const,identifier}))]; }
+}

@@ -8,6 +8,7 @@ export type EventCategory =
   | 'mining-adapter'
   | 'miner-process'
   | 'mining-statistics'
+  | 'mining-plugin-runtime'
   | 'cpu-mining'
   | 'gpu-mining'
   | 'asic-mining'

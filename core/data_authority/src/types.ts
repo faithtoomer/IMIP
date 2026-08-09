@@ -30,6 +30,7 @@ export type DataDomain =
   | 'miner-process-supervision'
   | 'mining-statistics'
   | 'mining-statistics-rollup'
+  | 'mining-plugin-runtime-registry'
   | 'cpu-mining-performance'
   | 'cpu-mining-digital-twin'
   | 'gpu-mining-performance'

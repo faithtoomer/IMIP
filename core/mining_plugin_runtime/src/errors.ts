@@ -1,0 +1,7 @@
+export class PluginRuntimeError extends Error { constructor(message: string) { super(message); this.name = 'PluginRuntimeError'; } }
+export class PluginManifestValidationError extends PluginRuntimeError { constructor(public readonly reasons: readonly string[]) { super(`Plugin manifest rejected: ${reasons.join('; ')}`); this.name = 'PluginManifestValidationError'; } }
+export class PluginDependencyValidationError extends PluginRuntimeError { constructor(public readonly reasons: readonly string[]) { super(`Plugin dependencies rejected: ${reasons.join('; ')}`); this.name = 'PluginDependencyValidationError'; } }
+export class PluginCertificationError extends PluginRuntimeError { constructor(public readonly reason: string) { super(`Plugin certification rejected: ${reason}`); this.name = 'PluginCertificationError'; } }
+export class PluginLifecycleError extends PluginRuntimeError { constructor(from: string | undefined, to: string) { super(`Invalid plugin runtime lifecycle transition from ${from ?? 'none'} to ${to}.`); this.name = 'PluginLifecycleError'; } }
+export class PluginScopeError extends PluginRuntimeError { constructor(pluginInstanceUuid: string) { super(`Plugin instance scope violation for ${pluginInstanceUuid}.`); this.name = 'PluginScopeError'; } }
+export class DuplicatePluginInstanceError extends PluginRuntimeError { constructor(pluginInstanceUuid: string) { super(`Plugin instance ${pluginInstanceUuid} is already loaded.`); this.name = 'DuplicatePluginInstanceError'; } }
